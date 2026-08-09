@@ -470,7 +470,7 @@ const toAssetUrl = (value?: string | null): string | null => {
   return value;
 };
 
-async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
+export async function request<T>(path: string, options: RequestOptions = {}): Promise<T> {
   const { params, headers: customHeaders, ...rest } = options;
 
   let url = `${ENV.API_URL}${path}`;

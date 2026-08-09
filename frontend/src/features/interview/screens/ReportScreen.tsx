@@ -92,9 +92,8 @@ export const ReportScreen: React.FC<ReportScreenProps> = ({ report, onRetry, onC
       ctx.fillText('VERIFIED SEAL', 400, 475);
 
       // Footer
-      ctx.fillStyle = '#71717a';
-      ctx.font = '11px monospace';
-      ctx.fillText('Verification Code: BUGX-AI-MOCK-' + Math.random().toString(36).substring(2, 8).toUpperCase(), 400, 540);
+      const certHash = (report.overallScore * 1000 + (report.summary?.length || 42) * 31).toString(36).toUpperCase();
+      ctx.fillText(`Verification Code: BUGX-CERT-${certHash}-${Date.now().toString(36).toUpperCase()}`, 400, 540);
 
       // Export & download trigger
       const dataUrl = canvas.toDataURL('image/png');

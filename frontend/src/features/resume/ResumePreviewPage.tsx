@@ -1,4 +1,4 @@
-import { useRef, useMemo } from 'react';
+import { useState, useRef, useMemo } from 'react';
 import { useAuth } from '../auth/useAuth';
 import { FEATURES } from '../../shared/config/features';
 import { Button } from '../../shared/ui/button/Button';
@@ -6,6 +6,8 @@ import { useResumeData } from './hooks/useResumeData';
 import { ResumeSection } from './components/ResumeSection';
 import { DifficultyBar } from './components/DifficultyBar';
 import { LanguageDonut, getLanguageColor } from './components/LanguageDonut';
+import { request } from '../../shared/lib/api';
+import { Upload, Sparkles, FileText, CheckCircle2, AlertTriangle, RefreshCw } from 'lucide-react';
 
 /* ─── Icons (inline SVG) ────────────────────────────────── */
 
@@ -40,6 +42,21 @@ const IconStar = () => (
   </svg>
 );
 
+interface AnalysisResult {
+  ats_score: number;
+  formatting_score: number;
+  impact_score: number;
+  skills_score: number;
+  detected_role: string;
+  summary: string;
+  identified_skills: string[];
+  missing_keywords: string[];
+  strengths: string[];
+  weaknesses: string[];
+  actionable_recommendations: string[];
+  bullet_improvements: Array<{ original: string; improved: string; reason: string }>;
+}
+
 /* ─── Loading shimmer ────────────────────────────────────── */
 
 function LoadingShimmer() {
@@ -69,6 +86,14 @@ export function ResumePreviewPage() {
   const { user } = useAuth();
   const { stats, submissions, isLoading, isError } = useResumeData();
   const resumeRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // AI Resume Analyzer State
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [targetRole, setTargetRole] = useState('Software Engineer');
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysisError, setAnalysisError] = useState<string | null>(null);
+  const [analysisResult, setAnalysisResult] = useState<AnalysisResult | null>(null);
 
   // Derive language breakdown from submissions
   const languageBreakdown = useMemo(() => {
@@ -91,6 +116,40 @@ export function ResumePreviewPage() {
     const accepted = submissions.filter((s) => s.status === 'accepted').length;
     return Math.round((accepted / submissions.length) * 100);
   }, [submissions]);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setSelectedFile(e.target.files[0]);
+      setAnalysisError(null);
+    }
+  };
+
+  const handleAnalyzeResume = async () => {
+    if (!selectedFile) {
+      setAnalysisError('Please select a PDF or text resume file first.');
+      return;
+    }
+
+    setIsAnalyzing(true);
+    setAnalysisError(null);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', selectedFile);
+      formData.append('target_role', targetRole);
+
+      const data = await request<AnalysisResult>('/resume/analyze', {
+        method: 'POST',
+        body: formData,
+      });
+      setAnalysisResult(data);
+    } catch (err: any) {
+      console.error('Resume Analysis Error:', err);
+      setAnalysisError(err.response?.data?.detail || 'Failed to analyze resume. Please try again.');
+    } finally {
+      setIsAnalyzing(false);
+    }
+  };
 
   /* Guard: feature flag */
   if (!FEATURES.RESUME_EXPORT) {
@@ -120,26 +179,195 @@ export function ResumePreviewPage() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto px-4 py-8 animate-fade-in">
+    <div className="max-w-4xl mx-auto px-4 py-8 animate-fade-in space-y-8">
       {/* Toolbar — hidden when printing */}
-      <div className="flex items-center justify-between mb-6 print:hidden">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 print:hidden">
         <div>
-          <h1 className="text-2xl font-bold text-gray-100">Resume Preview</h1>
-          <p className="text-sm text-gray-500 mt-1">Your coding profile at a glance</p>
+          <h1 className="text-2xl font-bold text-gray-100 flex items-center gap-2.5">
+            <FileText className="w-6 h-6 text-[#4F7DFF]" />
+            AI Resume Analyzer & Profile
+          </h1>
+          <p className="text-sm text-gray-500 mt-1">Upload your resume for real AI ATS optimization + export your bugX coding profile</p>
         </div>
         <Button variant="primary" size="md" onClick={handlePrint}>
           <span className="flex items-center gap-2">
             <IconPrint />
-            Print / Save PDF
+            Print / Save Profile PDF
           </span>
         </Button>
       </div>
 
-      {/* ─── Resume Card ────────────────────────────────── */}
+      {/* ─── Real AI Resume Upload & ATS Scanner Section ──────── */}
+      <div className="rounded-2xl border border-[#4F7DFF]/20 bg-dark-panel p-6 space-y-6 shadow-xl relative overflow-hidden print:hidden">
+        <div className="absolute top-0 right-0 w-80 h-80 bg-[#4F7DFF]/5 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="flex items-center justify-between border-b border-dark-border pb-4">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-5 h-5 text-[#4F7DFF]" />
+            <h2 className="text-lg font-bold text-gray-100">Upload Resume for AI ATS Analysis</h2>
+          </div>
+          <span className="text-xs px-2.5 py-1 rounded-full bg-[#4F7DFF]/10 text-[#4F7DFF] font-semibold border border-[#4F7DFF]/20">
+            Powered by bugX AI Engine
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* Target Role Selector */}
+          <div className="space-y-2">
+            <label className="text-xs font-semibold text-gray-400">Target Role Category</label>
+            <select
+              value={targetRole}
+              onChange={(e) => setTargetRole(e.target.value)}
+              className="w-full px-3 py-2 bg-dark-bg border border-dark-border rounded-xl text-xs text-gray-200 focus:outline-none focus:border-[#4F7DFF]"
+            >
+              <option value="Software Engineer">Software Engineer (General)</option>
+              <option value="Full Stack Developer">Full Stack Developer</option>
+              <option value="Backend Engineer">Backend Engineer</option>
+              <option value="Frontend Engineer">Frontend Engineer</option>
+              <option value="DevOps / Infrastructure">DevOps / Cloud Engineer</option>
+              <option value="Data Engineer / AI">Data Engineer / AI</option>
+            </select>
+          </div>
+
+          {/* File Picker */}
+          <div className="md:col-span-2 space-y-2">
+            <label className="text-xs font-semibold text-gray-400">Upload PDF or Text Resume</label>
+            <div className="flex items-center gap-3">
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept=".pdf,.txt,.md"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="flex-1 px-4 py-2 bg-dark-bg border border-dashed border-dark-border hover:border-[#4F7DFF]/50 rounded-xl text-xs text-gray-300 flex items-center justify-center gap-2 transition-colors"
+              >
+                <Upload className="w-4 h-4 text-[#4F7DFF]" />
+                <span className="truncate">{selectedFile ? selectedFile.name : 'Choose Resume (.pdf, .txt)'}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleAnalyzeResume}
+                disabled={isAnalyzing || !selectedFile}
+                className="px-5 py-2 bg-[#4F7DFF] hover:bg-[#3D6CE5] disabled:opacity-50 text-white rounded-xl text-xs font-bold flex items-center gap-2 shrink-0 transition-colors shadow-lg shadow-[#4F7DFF]/20"
+              >
+                {isAnalyzing ? (
+                  <>
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                    Analyzing...
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    Run AI Analysis
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {analysisError && (
+          <div className="p-3 bg-red-500/10 border border-red-500/20 rounded-xl flex items-center gap-2 text-xs text-red-400">
+            <AlertTriangle className="w-4 h-4 shrink-0" />
+            <span>{analysisError}</span>
+          </div>
+        )}
+
+        {/* AI Analysis Result Output */}
+        {analysisResult && (
+          <div className="space-y-6 pt-4 border-t border-dark-border animate-fade-in">
+            {/* Score Cards */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+              <div className="p-4 rounded-xl bg-dark-bg border border-dark-border text-center">
+                <p className="text-[10px] uppercase font-bold text-gray-500">Overall ATS Score</p>
+                <p className={`text-2xl font-black font-mono mt-1 ${analysisResult.ats_score >= 75 ? 'text-emerald-400' : 'text-amber-400'}`}>
+                  {analysisResult.ats_score}/100
+                </p>
+              </div>
+              <div className="p-4 rounded-xl bg-dark-bg border border-dark-border text-center">
+                <p className="text-[10px] uppercase font-bold text-gray-500">Skills Match</p>
+                <p className="text-2xl font-black font-mono text-[#4F7DFF] mt-1">{analysisResult.skills_score}/100</p>
+              </div>
+              <div className="p-4 rounded-xl bg-dark-bg border border-dark-border text-center">
+                <p className="text-[10px] uppercase font-bold text-gray-500">Impact Metrics</p>
+                <p className="text-2xl font-black font-mono text-purple-400 mt-1">{analysisResult.impact_score}/100</p>
+              </div>
+              <div className="p-4 rounded-xl bg-dark-bg border border-dark-border text-center">
+                <p className="text-[10px] uppercase font-bold text-gray-500">Formatting</p>
+                <p className="text-2xl font-black font-mono text-teal-400 mt-1">{analysisResult.formatting_score}/100</p>
+              </div>
+            </div>
+
+            {/* Summary */}
+            <div className="p-4 rounded-xl bg-dark-bg/60 border border-dark-border space-y-1">
+              <p className="text-xs font-bold text-gray-300">AI Profile Summary</p>
+              <p className="text-xs text-gray-400 leading-relaxed">{analysisResult.summary}</p>
+            </div>
+
+            {/* Skills & Keyword Gaps */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-2 p-4 rounded-xl bg-dark-bg/40 border border-dark-border">
+                <p className="text-xs font-bold text-emerald-400 flex items-center gap-1.5">
+                  <CheckCircle2 className="w-4 h-4" /> Detected Technical Skills ({analysisResult.identified_skills.length})
+                </p>
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {analysisResult.identified_skills.map((skill, idx) => (
+                    <span key={idx} className="px-2.5 py-1 bg-emerald-500/10 text-emerald-300 rounded-md text-[11px] font-mono border border-emerald-500/20">
+                      {skill}
+                    </span>
+                  ))}
+                </div>
+              </div>
+
+              <div className="space-y-2 p-4 rounded-xl bg-dark-bg/40 border border-dark-border">
+                <p className="text-xs font-bold text-amber-400 flex items-center gap-1.5">
+                  <AlertTriangle className="w-4 h-4" /> Recommended Keywords to Add
+                </p>
+                <div className="flex flex-wrap gap-1.5 pt-1">
+                  {analysisResult.missing_keywords.map((keyword, idx) => (
+                    <span key={idx} className="px-2.5 py-1 bg-amber-500/10 text-amber-300 rounded-md text-[11px] font-mono border border-amber-500/20">
+                      + {keyword}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Bullet Point Improvement Suggestion */}
+            {analysisResult.bullet_improvements?.length > 0 && (
+              <div className="space-y-3 p-4 rounded-xl bg-dark-bg/40 border border-dark-border">
+                <p className="text-xs font-bold text-[#4F7DFF] flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4" /> AI Quantifiable Bullet Rewrites
+                </p>
+                {analysisResult.bullet_improvements.map((bullet, idx) => (
+                  <div key={idx} className="p-3 bg-dark-panel rounded-lg space-y-2 text-xs border border-dark-border">
+                    <div className="flex items-start gap-2 text-red-400/80">
+                      <span className="font-bold shrink-0">Before:</span>
+                      <span className="line-through">{bullet.original}</span>
+                    </div>
+                    <div className="flex items-start gap-2 text-emerald-400 font-medium">
+                      <span className="font-bold shrink-0">AI Improved:</span>
+                      <span>{bullet.improved}</span>
+                    </div>
+                    <p className="text-[11px] text-gray-500 italic pl-16">Reason: {bullet.reason}</p>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
+
+      {/* ─── Resume Coding Profile Card ────────────────────────── */}
       <div
         ref={resumeRef}
         id="resume-preview"
-        className="relative rounded-2xl border border-white/[0.06] bg-white/[0.02] p-8 space-y-8 overflow-hidden print:bg-white print:text-black print:rounded-none print:border-gray-300"
+        className="relative rounded-2xl border border-white/[0.06] bg-white/[0.02] p-8 space-y-8 overflow-hidden print:bg-white print:text-black print:rounded-none print:border-gray-300 shadow-2xl"
       >
         {/* Accent bar */}
         <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#4F7DFF] via-[#7A5FFF] to-[#4F7DFF] opacity-60 rounded-t-2xl print:hidden" />

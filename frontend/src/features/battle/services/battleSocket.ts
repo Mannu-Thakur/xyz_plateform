@@ -80,11 +80,9 @@ export class BattleSocketService {
     const apiURL = ENV.API_URL;
     const host = apiURL.replace(/^https?:\/\//, '').split('/')[0];
     const wsProtocol = apiURL.startsWith('https') ? 'wss' : 'ws';
-    const token = getToken() || '';
+    const freshToken = getToken() || '';
     
-     const wsUrl = `${wsProtocol}://${host}/api/v1/battle/ws/${this.roomId}?player_index=${this.playerIndex}&token=${encodeURIComponent(token)}`;
-
-     
+    const wsUrl = `${wsProtocol}://${host}/api/v1/battle/ws/${this.roomId}?player_index=${this.playerIndex}&token=${encodeURIComponent(freshToken)}`;
     
     try {
       this.socket = new WebSocket(wsUrl);

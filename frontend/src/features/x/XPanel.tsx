@@ -173,6 +173,19 @@ export const XPanel: React.FC<XPanelProps> = ({
     sampleInput,
   ]);
 
+  // Listen for Ask X selection event from CodeEditor
+  useEffect(() => {
+    const handler = (e: Event) => {
+      const ce = e as CustomEvent<{ code: string }>;
+      if (ce.detail?.code) {
+        const snippetPrompt = `Explain and analyze this selected code snippet:\n\`\`\`${language}\n${ce.detail.code}\n\`\`\``;
+        handleSend(snippetPrompt);
+      }
+    };
+    window.addEventListener('bugx-ask-x-selection', handler);
+    return () => window.removeEventListener('bugx-ask-x-selection', handler);
+  }, [handleSend, language]);
+
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();

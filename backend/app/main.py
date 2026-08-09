@@ -131,6 +131,7 @@ def create_app() -> FastAPI:
     from app.routers.companies import router as companies_router
     from app.routers.topics import router as topics_router
     from app.routers.stats import router as stats_router
+    from app.routers.resume import router as resume_router
 
     app.include_router(
         health_router,
@@ -190,6 +191,11 @@ def create_app() -> FastAPI:
         daily_router,
         prefix=settings.API_V1_PREFIX,
         tags=["daily"],
+    )
+    app.include_router(
+        resume_router,
+        prefix=f"{settings.API_V1_PREFIX}/resume",
+        tags=["resume"],
     )
 
     return app

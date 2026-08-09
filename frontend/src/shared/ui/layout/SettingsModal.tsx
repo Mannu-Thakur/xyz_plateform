@@ -46,29 +46,49 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose, i
     const wsUrl = `${wsProtocol}://${host}/api/v1/stats/ws?session_id=${SESSION_ID}`;
 
     let socket: WebSocket | null = null;
-    try {
-      socket = new WebSocket(wsUrl);
+    let isDisposed = false;
+    let retryTimer: ReturnType<typeof setTimeout> | null = null;
 
-      socket.onmessage = (event) => {
-        try {
-          const data = JSON.parse(event.data);
-          if (data && typeof data.online_users === 'number') {
-            setOnlineUsers(data.online_users);
+    const connectWS = () => {
+      if (isDisposed) return;
+      try {
+        socket = new WebSocket(wsUrl);
+
+        socket.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            if (data && typeof data.online_users === 'number') {
+              setOnlineUsers(data.online_users);
+            }
+          } catch (e) {
+            console.error('[StatsSocket] Failed to parse message', e);
           }
-        } catch (e) {
-          console.error('[StatsSocket] Failed to parse message', e);
-        }
-      };
+        };
 
-      socket.onerror = (err) => {
-        console.error('[StatsSocket] WebSocket error', err);
-      };
-    } catch (err) {
-      console.error('[StatsSocket] Failed to create WebSocket', err);
-    }
+        socket.onerror = (err) => {
+          console.error('[StatsSocket] WebSocket error', err);
+        };
+
+        socket.onclose = () => {
+          if (!isDisposed) {
+            retryTimer = setTimeout(connectWS, 4000);
+          }
+        };
+      } catch (err) {
+        console.error('[StatsSocket] Failed to create WebSocket', err);
+        if (!isDisposed) {
+          retryTimer = setTimeout(connectWS, 5000);
+        }
+      }
+    };
+
+    connectWS();
 
     return () => {
+      isDisposed = true;
+      if (retryTimer) clearTimeout(retryTimer);
       if (socket) {
+        socket.onclose = null;
         socket.close();
       }
     };

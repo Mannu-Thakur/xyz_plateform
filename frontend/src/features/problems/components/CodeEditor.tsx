@@ -90,8 +90,9 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
   const [fontSize, setFontSize] = useState(getInitialFontSize);
   const [tabSize, setTabSize] = useState(() => Number(localStorage.getItem('editor_tab_size') || '4'));
 
-  // Real-time cursor and save state tracking
+  // Real-time cursor, selection and save state tracking
   const [cursorPos, setCursorPos] = useState({ line: 1, column: 1 });
+  const [selectedCode, setSelectedCode] = useState('');
   const [saveStatus, setSaveStatus] = useState<'saved' | 'saving'>('saved');
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -336,9 +337,40 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
       run: () => { onSubmitRef.current?.(); }
     });
 
-    // Track cursor location in real time
+    // Add Ask X shortcut & context menu action (Ctrl + Shift + X)
+    editor.addAction({
+      id: 'bugx-ask-x',
+      label: 'Ask X about selected code 🤖',
+      keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyX],
+      precondition: undefined,
+      keybindingContext: undefined,
+      contextMenuGroupId: 'navigation',
+      contextMenuOrder: 1.4,
+      run: (ed: any) => {
+        const selection = ed.getSelection();
+        const model = ed.getModel();
+        let targetCode = ed.getValue();
+        if (selection && model && !selection.isEmpty()) {
+          targetCode = model.getValueInRange(selection);
+        }
+        window.dispatchEvent(new CustomEvent('bugx-ask-x-selection', { detail: { code: targetCode } }));
+      }
+    });
+
+    // Track cursor location and text selection in real time
     editor.onDidChangeCursorPosition((e: { position: { lineNumber: number; column: number } }) => {
       setCursorPos({ line: e.position.lineNumber, column: e.position.column });
+    });
+
+    editor.onDidChangeCursorSelection((e: any) => {
+      const selection = e.selection;
+      const model = editor.getModel();
+      if (selection && model && !selection.isEmpty()) {
+        const text = model.getValueInRange(selection);
+        setSelectedCode(text.trim());
+      } else {
+        setSelectedCode('');
+      }
     });
 
     // Track model content changes to simulate real-time DB autosaving
@@ -441,8 +473,21 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
           )}
         </div>
 
-        {/* RIGHT: Icon Toolbar */}
-        <div className="flex items-center gap-0.5">
+        {/* RIGHT: Icon Toolbar & Contextual Ask X Button */}
+        <div className="flex items-center gap-1.5">
+          {selectedCode && (
+            <button
+              onClick={() => {
+                if (!isXOpen) onToggleX?.();
+                window.dispatchEvent(new CustomEvent('bugx-ask-x-selection', { detail: { code: selectedCode } }));
+              }}
+              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#4F7DFF]/20 border border-[#4F7DFF]/40 text-[#4F7DFF] hover:bg-[#4F7DFF] hover:text-white transition-all text-xs font-bold shadow-sm cursor-pointer animate-fade-in"
+              title="Ask X AI to explain or analyze selected code snippet"
+            >
+              <span>🤖 Ask X ({selectedCode.split('\n').length} lines)</span>
+            </button>
+          )}
+
           {/* X AI Toggle */}
           {onToggleX && (
             <button

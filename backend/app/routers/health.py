@@ -34,9 +34,7 @@ async def _check_database() -> str:
         async with AsyncSessionLocal() as session:
             await session.execute(text("SELECT 1"))
         return "ok"
-    except SQLAlchemyError:
-        return "error"
-    except OSError:
+    except Exception:
         return "error"
 
 

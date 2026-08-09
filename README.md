@@ -28,102 +28,89 @@ It combines **coding practice**, **real-time multiplayer battles**, **AI-powered
 ## ✨ Features
 
 ### 💻 Smart Coding Workspace
-
-- Multi-language code editor powered by Monaco
-- Real-time code execution via Judge0
-- Custom test cases & submission history
-- Difficulty-based filtering
-- Topic-wise & company-wise problem collections
-- Daily coding challenges
-- Bookmark & progress tracking
+- **Multi-Language Monaco Editor**: High-performance editor supporting **8 programming languages** (Python, C++, Java, JavaScript, TypeScript, Go, Rust, Ruby).
+- **Dual Execution Engine**: Real-time code execution via **Judge0 API** with isolated **Local Sandbox Executor** fallback.
+- **Dynamic Harness Generator**: Auto-wraps solution functions across all signature styles (single, multiple, matrix, string, linked list, binary tree).
+- **On-Demand Problem Importer**: Search and auto-import problems instantly from **LeetCode**, **GeeksforGeeks**, or **Google** by keyword or URL.
+- **Test Case Runner**: Custom input testing with line-by-line assertion comparisons and memory/time limit enforcement.
+- **Submission History**: Complete submission timeline with score calculation, rescoring, and runtime performance bonuses.
 
 ---
 
 ### 🤖 X — AI Chat Assistant
-
-A built-in AI chat panel (powered via OpenRouter) for coding assistance and beyond.
-
-- Supports multiple LLM models (auto-verified via API)
-- Markdown rendering with syntax-highlighted code blocks
-- **KaTeX** support for inline and display LaTeX math
-- Inline *Apply Code* button to push AI suggestions directly into the editor
-- Real-time online user count via **WebSocket**
-- Session-based tracking (no IP fallback)
-- Configurable system prompt, temperature, and model selection
+- Built-in AI chat assistant powered via **OpenRouter** (multi-model selection: Claude, GPT-4, DeepSeek, Llama, Gemini).
+- **KaTeX** math support for inline and display LaTeX equations.
+- Markdown rendering with syntax-highlighted code snippets.
+- **Inline *Apply Code* Button**: Push AI solution suggestions directly into the Monaco editor with one click.
+- Real-time online user count tracking via **WebSocket** sessions.
+- Customizable system prompt, temperature controls, and model persistence.
 
 ---
 
-### 🧠 AI-Powered Learning
-
-- AI problem explanations & solution approaches
-- AI code review & optimization
-- AI debugging assistance
-- AI interview simulator
-- Intelligent hints without revealing complete solutions
+### 🧠 AI-Powered Learning & Interview Simulator
+- **AI Problem Explanations**: Step-by-step intuition, hints, and complexity analysis without spoiling full code solutions immediately.
+- **AI Code Review**: Automated refactoring, code optimization advice, and edge-case detection.
+- **AI Mock Interview Simulator**: Interactive mock technical loops, response evaluation radar charts, and verified downloadable certification badges.
 
 ---
 
 ### 📊 Algorithm Visualization Playground
+An interactive visualizer for understanding data structures and algorithms through step-by-step animated execution.
 
-An interactive playground for understanding algorithms through real-time animations.
+**Supported Algorithms & Data Structures:**
 
-**Supported Algorithms:**
+| Sorting | Searching | Data Structures | Dynamic Programming |
+|---|---|---|---|
+| Bubble Sort | Binary Search | Linked List Reversal | Fibonacci DP (Memoization) |
+| Selection Sort | | Stack Operations (Push/Pop/Peek) | |
+| Insertion Sort | | Queue Operations (Enqueue/Dequeue/Peek) | |
+| Merge Sort | | | |
+| Quick Sort | | | |
 
-| Sorting | Searching | Graph |
-|---|---|---|
-| Bubble Sort | Binary Search | BFS |
-| Selection Sort | | DFS |
-| Insertion Sort | | |
-| Merge Sort | | |
-| Quick Sort | | |
-
-**Controls:** ▶ Play · ⏸ Pause · ⏭ Step Forward · 🎚 Speed Control · 🔄 Reset
+**Controls:** ▶ Play · ⏸ Pause · ⏭ Step Forward · ⏮ Step Backward · 🎚 Speed Control · 🔄 Reset · Custom Array Input · Stack Frame Tracer
 
 ---
 
 ### ⚔️ Real-Time Coding Battles
-
-Compete against other programmers in live coding matches.
-
-- 1v1 multiplayer battles via WebSocket
-- Live countdown timer & shared coding environment
-- Automatic winner detection
-- Live battle leaderboard
+- **1v1 & Multiplayer Arenas**: Create or join live coding battles supporting up to **20 players**.
+- **WebSocket + Redis PubSub**: Real-time match synchronization across multi-process nodes.
+- **Catalog or Custom Problems**: Choose catalog problems or build custom multi-problem battle rooms on the fly.
+- **Live Match Arena**: Shared countdown timer, live opponent progress feed, real-time submission verification, automated winner determination, and battle leaderboards.
 
 ---
 
-### 📄 Resume Analyzer
-
-- Upload and analyze your resume with AI
-- Get feedback and improvement suggestions
-- ATS-friendly recommendations
-
----
-
-### 📈 Personalized Dashboard & Analytics
-
-- Solved problems & submission statistics
-- Topic-wise & company-wise progress
-- Battle history & performance insights
-- Live platform online user count
+### 📄 AI Resume Analyzer
+- Upload PDF or TXT resume files (up to 10MB) powered by `pypdf` text extraction.
+- **ATS Compatibility Score**: Overall score, formatting score, impact score, and skills match score.
+- **Recruiter Suggestions**: Actionable recommendations, detected role analysis, identified skills, missing keywords, and bullet point rewrite suggestions.
+- **Dual AI / Rule Engine**: Uses OpenRouter LLM analysis with dynamic text metric fallback engine.
 
 ---
 
-### 🏆 Interview Preparation
+### 📈 Analytics & Global Leaderboards
+- **Global & Weekly Leaderboards**: User rankings by overall score, problems solved, battles won, and active streaks.
+- **Personal Analytics Dashboard**: Solved problem distribution (Easy/Medium/Hard), topic mastery radar, submission activity heatmap calendar, and battle win rates.
 
-- Company-specific problem collections
-- Topic-wise learning paths
-- Daily coding challenges
-- AI interview simulator
-- Performance tracking
+---
+
+### 💼 Interview Preparation & Collections
+- **Company Tracks**: Filter problems tagged by top tech companies (**Google**, **Meta**, **Amazon**, **Microsoft**, **Apple**, **Netflix**).
+- **Topic Tracks**: DSA learning paths (Arrays, DP, Graphs, Trees, Strings, Two Pointers, Binary Search).
+- **Daily Coding Challenges**: Daily rotating problem with streak bonuses and score multipliers.
+- **Public Profiles**: Shareable user handle pages (`/u/:username`) showcasing badges and activity timelines.
+
+---
+
+### 🛠️ Admin Dashboard
+- Protected admin routes (`AdminRoute`) for creating, editing, and publishing problems.
+- Automated problem importer dashboard for batch loading LeetCode, GeeksforGeeks, or Google problems.
+- Real-time system metric overview and problem catalog controls.
 
 ---
 
 ### 🎨 Appearance & Settings
-
-- Light / Dark / System theme toggle
-- Customizable editor font size and settings
-- Persistent user preferences
+- Theme customization: Dark, Cyberpunk, Midnight, Slate themes.
+- Monaco editor themes, font scaling, and persistent local preferences.
 
 ---
 

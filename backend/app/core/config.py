@@ -52,6 +52,9 @@ class Settings(BaseSettings):
     FRONTEND_URL: str = "http://localhost:5173"
     BACKEND_URL: str = "http://localhost:8000"
 
+    # ── AI / LLM ──────────────────────────────────────────────────────────────
+    OPENROUTER_API_KEY: str = ""
+
     # ── Rate Limiting ─────────────────────────────────────────────────────────
     MAX_SUBMISSIONS_PER_MINUTE: int = 10
     MAX_REQUESTS_PER_MINUTE_IP: int = 100
