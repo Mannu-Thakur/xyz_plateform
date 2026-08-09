@@ -28,7 +28,7 @@ It combines **coding practice**, **real-time multiplayer battles**, **AI-powered
 ## ✨ Features
 
 ### 💻 Smart Coding Workspace
-- **Multi-Language Monaco Editor**: High-performance editor supporting **8 programming languages** (Python, C++, Java, JavaScript, TypeScript, Go, Rust, Ruby).
+- **Multi-Language Monaco Editor**: High-performance editor supporting **4 core programming languages** (Python, C++, Java, JavaScript).
 - **Dual Execution Engine**: Real-time code execution via **Judge0 API** with isolated **Local Sandbox Executor** fallback.
 - **Dynamic Harness Generator**: Auto-wraps solution functions across all signature styles (single, multiple, matrix, string, linked list, binary tree).
 - **On-Demand Problem Importer**: Search and auto-import problems instantly from **LeetCode**, **GeeksforGeeks**, or **Google** by keyword or URL.
