@@ -166,7 +166,7 @@ Then verify:
 - `GET http://localhost:8000/api/v1/health` returns `status: ok` or clearly shows which dependency is degraded,
 - Judge0 `/workers` reports at least one available worker,
 - seeded problems are available through the current problem routes,
-- the XYZ worker is running before testing Run/Submit.
+- the bugX worker is running before testing Run/Submit.
 
 ## Known Risks
 

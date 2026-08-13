@@ -7,6 +7,7 @@ Create Date: 2026-05-25 00:00:00.000000
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
 
 revision = 'b2c3d4e5f6a7'
 down_revision = 'a1b2c3d4e5f6'
@@ -17,9 +18,9 @@ depends_on = None
 def upgrade() -> None:
     # Submission status enum — includes SAMPLE_PASSED per spec
     op.execute(
-        "CREATE TYPE submission_status AS ENUM ("
+        "DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'submission_status') THEN CREATE TYPE submission_status AS ENUM ("
         "'PENDING', 'RUNNING', 'ACCEPTED', 'SAMPLE_PASSED', "
-        "'WRONG_ANSWER', 'TIME_LIMIT', 'RUNTIME_ERROR', 'COMPILE_ERROR', 'MEMORY_LIMIT')"
+        "'WRONG_ANSWER', 'TIME_LIMIT', 'RUNTIME_ERROR', 'COMPILE_ERROR', 'MEMORY_LIMIT'); END IF; END $$;"
     )
 
     op.create_table(
@@ -29,7 +30,7 @@ def upgrade() -> None:
         sa.Column('problem_id', sa.UUID(), nullable=False),
         sa.Column('language', sa.String(length=20), nullable=False),
         sa.Column('source_code', sa.Text(), nullable=False),
-        sa.Column('status', sa.Enum(
+        sa.Column('status', postgresql.ENUM(
             'PENDING', 'RUNNING', 'ACCEPTED', 'SAMPLE_PASSED',
             'WRONG_ANSWER', 'TIME_LIMIT', 'RUNTIME_ERROR', 'COMPILE_ERROR', 'MEMORY_LIMIT',
             name='submission_status', create_type=False

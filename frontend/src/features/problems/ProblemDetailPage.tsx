@@ -21,8 +21,13 @@ import { XPanel } from '../x/XPanel';
 
 // Inner component that consumes XContext
 const ProblemDetailInner: React.FC = () => {
-  const { isOpen: isXOpen, togglePanel: toggleX } = useX();
+  const { isOpen: isXOpen, togglePanel: toggleX, closePanel: closeX } = useX();
   const { slug } = useParams<{ slug: string }>();
+
+  // Ensure AI panel is closed by default when opening any problem (showing Question & Code panels)
+  useEffect(() => {
+    closeX();
+  }, [slug, closeX]);
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { user } = useAuth();

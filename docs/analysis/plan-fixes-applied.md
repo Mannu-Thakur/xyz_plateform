@@ -1,15 +1,15 @@
-# Plan Fixes Applied — XYZ Platform
+# Plan Fixes Applied — bugX Platform
 
-Log of documentation fixes applied to make the plan implementation-ready and to separate the project as **xyz_plateform**.
+Log of documentation fixes applied to make the plan implementation-ready and to separate the project as **bugX**.
 
 ## 1. Project separation
 
 | Action | Detail |
 |--------|--------|
-| New repo root | `xyz_plateform/` — dedicated Git repository |
+| New repo root | `bugX/` — dedicated Git repository |
 | Removed | Legacy `code-judge/` folder; split from unrelated projects |
-| Rebrand | CodeForge → XYZ Platform |
-| Env names | Postgres user/db `xyz_platform`; admin email `admin@xyz-platform.local` |
+| Rebrand | CodeForge → bugX Platform |
+| Env names | Postgres user/db `bugx`; admin email `admin@bugx.local` |
 
 ## 2. Docker Compose location
 
@@ -59,7 +59,7 @@ Log of documentation fixes applied to make the plan implementation-ready and to 
 | Judge0 config | Added `backend/judge0.conf.example`; ignored local `backend/judge0.conf` |
 | Admin validation | Added numeric ranges, safe `function_name`, JSON test I/O, `weight >= 1`, and unique `order_index` requirements |
 | Scoring | Added defensive invalid-config guard and `runtime_ms is None` behavior |
-| Frontend prerequisites | Changed startup order so migrations + seed run before `api` / XYZ `worker` start |
+| Frontend prerequisites | Changed startup order so migrations + seed run before `api` / bugX `worker` start |
 | Dependencies | Added `email-validator` for Pydantic `EmailStr` |
 | Docker | Added `backend/Dockerfile` and documented it before compose `api` / `worker` use `build: .` |
 

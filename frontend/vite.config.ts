@@ -43,6 +43,11 @@ export default defineConfig({
         changeOrigin: true,
         rewrite: (path) => path.replace(/^\/proxy\/moonshot/, ''),
       },
+      '/proxy/anthropic': {
+        target: 'https://api.anthropic.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/proxy\/anthropic/, ''),
+      },
       '/proxy/bytedance': {
         target: 'https://ark.cn-beijing.volces.com',
         changeOrigin: true,

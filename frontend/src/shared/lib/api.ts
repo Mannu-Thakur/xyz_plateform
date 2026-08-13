@@ -73,6 +73,11 @@ export interface User {
   role: Role;
   avatarUrl: string | null;
   leetcodeUrl: string | null;
+  codeforcesUrl: string | null;
+  gfgUrl: string | null;
+  leetcodeUsername: string | null;
+  codeforcesUsername: string | null;
+  gfgUsername: string | null;
   githubUrl: string | null;
   linkedinUrl: string | null;
   portfolioUrl: string | null;
@@ -82,6 +87,7 @@ export interface User {
   isActive: boolean;
   createdAt: string;
 }
+
 
 export interface StudyFileItem {
   id: string;
@@ -182,6 +188,7 @@ export interface CompanyDetail {
   logo_light: string | null;
   logo_dark: string | null;
   brand_color: string | null;
+  problems: ProblemListItem[];
 }
 
 export interface CompanyResponse {
@@ -553,6 +560,16 @@ interface RawUser {
   avatarUrl?: string | null;
   leetcode_url?: string | null;
   leetcodeUrl?: string | null;
+  codeforces_url?: string | null;
+  codeforcesUrl?: string | null;
+  gfg_url?: string | null;
+  gfgUrl?: string | null;
+  leetcode_username?: string | null;
+  leetcodeUsername?: string | null;
+  codeforces_username?: string | null;
+  codeforcesUsername?: string | null;
+  gfg_username?: string | null;
+  gfgUsername?: string | null;
   github_url?: string | null;
   githubUrl?: string | null;
   linkedin_url?: string | null;
@@ -576,6 +593,11 @@ const normalizeUser = (raw: RawUser): User => ({
   role: raw.role,
   avatarUrl: toAssetUrl(raw.avatarUrl ?? raw.avatar_url ?? null),
   leetcodeUrl: raw.leetcodeUrl ?? raw.leetcode_url ?? null,
+  codeforcesUrl: raw.codeforcesUrl ?? raw.codeforces_url ?? null,
+  gfgUrl: raw.gfgUrl ?? raw.gfg_url ?? null,
+  leetcodeUsername: raw.leetcodeUsername ?? raw.leetcode_username ?? null,
+  codeforcesUsername: raw.codeforcesUsername ?? raw.codeforces_username ?? null,
+  gfgUsername: raw.gfgUsername ?? raw.gfg_username ?? null,
   githubUrl: raw.githubUrl ?? raw.github_url ?? null,
   linkedinUrl: raw.linkedinUrl ?? raw.linkedin_url ?? null,
   portfolioUrl: raw.portfolioUrl ?? raw.portfolio_url ?? null,
@@ -590,6 +612,11 @@ export interface UserUpdatePayload {
   username?: string;
   avatarUrl?: string | null;
   leetcodeUrl?: string | null;
+  codeforcesUrl?: string | null;
+  gfgUrl?: string | null;
+  leetcodeUsername?: string | null;
+  codeforcesUsername?: string | null;
+  gfgUsername?: string | null;
   githubUrl?: string | null;
   linkedinUrl?: string | null;
   portfolioUrl?: string | null;
@@ -602,6 +629,11 @@ const toUserUpdatePayload = (body: UserUpdatePayload) => ({
   ...(body.username !== undefined ? { username: body.username } : {}),
   ...(body.avatarUrl !== undefined ? { avatar_url: body.avatarUrl } : {}),
   ...(body.leetcodeUrl !== undefined ? { leetcode_url: body.leetcodeUrl } : {}),
+  ...(body.codeforcesUrl !== undefined ? { codeforces_url: body.codeforcesUrl } : {}),
+  ...(body.gfgUrl !== undefined ? { gfg_url: body.gfgUrl } : {}),
+  ...(body.leetcodeUsername !== undefined ? { leetcode_username: body.leetcodeUsername } : {}),
+  ...(body.codeforcesUsername !== undefined ? { codeforces_username: body.codeforcesUsername } : {}),
+  ...(body.gfgUsername !== undefined ? { gfg_username: body.gfgUsername } : {}),
   ...(body.githubUrl !== undefined ? { github_url: body.githubUrl } : {}),
   ...(body.linkedinUrl !== undefined ? { linkedin_url: body.linkedinUrl } : {}),
   ...(body.portfolioUrl !== undefined ? { portfolio_url: body.portfolioUrl } : {}),

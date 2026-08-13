@@ -295,7 +295,7 @@ Stabilize the full frontend and verify end-to-end workflows.
 
 Backend dependency:
 
-- full backend stack running: Postgres, Redis, Judge0 server, Judge0 workers, API, XYZ worker, migrations, seed data.
+- full backend stack running: Postgres, Redis, Judge0 server, Judge0 workers, API, bugX worker, migrations, seed data.
 
 Deliverables:
 

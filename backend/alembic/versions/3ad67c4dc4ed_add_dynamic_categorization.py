@@ -99,15 +99,19 @@ def upgrade() -> None:
     op.create_index('idx_user_progress_user_id', 'user_problem_progress', ['user_id'], unique=False)
     op.create_index('idx_user_progress_problem_id', 'user_problem_progress', ['problem_id'], unique=False)
 
-    # 7. Alter problem_aliases
-    op.alter_column('problem_aliases', 'created_at',
-               existing_type=postgresql.TIMESTAMP(),
-               type_=sa.DateTime(timezone=True),
-               existing_nullable=True)
-    op.alter_column('problem_aliases', 'updated_at',
-               existing_type=postgresql.TIMESTAMP(),
-               type_=sa.DateTime(timezone=True),
-               existing_nullable=True)
+    # 7. Create/Alter problem_aliases
+    op.execute("""
+        CREATE TABLE IF NOT EXISTS problem_aliases (
+            id SERIAL PRIMARY KEY,
+            normalized_query VARCHAR(512) UNIQUE NOT NULL,
+            canonical_slug VARCHAR(256) NOT NULL,
+            source VARCHAR(50) NOT NULL,
+            aliases TEXT DEFAULT '[]',
+            hit_count INTEGER DEFAULT 0,
+            created_at TIMESTAMP WITH TIME ZONE DEFAULT now(),
+            updated_at TIMESTAMP WITH TIME ZONE DEFAULT now()
+        );
+    """)
 
     # 8. Alter problems (add source, external_problem_id, updated_at, last_synced_at)
     op.add_column('problems', sa.Column('source', sa.String(length=100), nullable=True))

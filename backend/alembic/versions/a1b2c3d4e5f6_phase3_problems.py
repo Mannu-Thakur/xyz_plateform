@@ -7,6 +7,7 @@ Create Date: 2026-05-25 00:00:00.000000
 
 from alembic import op
 import sqlalchemy as sa
+from sqlalchemy.dialects import postgresql
 
 revision = 'a1b2c3d4e5f6'
 down_revision = 'f3c6daa994d5'
@@ -16,8 +17,8 @@ depends_on = None
 
 def upgrade() -> None:
     # Enums
-    op.execute("CREATE TYPE difficulty_enum AS ENUM ('EASY', 'MEDIUM', 'HARD')")
-    op.execute("CREATE TYPE arg_style_enum AS ENUM ('kwargs', 'positional', 'single')")
+    op.execute("DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'difficulty_enum') THEN CREATE TYPE difficulty_enum AS ENUM ('EASY', 'MEDIUM', 'HARD'); END IF; END $$;")
+    op.execute("DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'arg_style_enum') THEN CREATE TYPE arg_style_enum AS ENUM ('kwargs', 'positional', 'single'); END IF; END $$;")
 
     # Tags
     op.create_table(
@@ -35,7 +36,7 @@ def upgrade() -> None:
         sa.Column('slug', sa.String(length=100), nullable=False),
         sa.Column('title', sa.String(length=200), nullable=False),
         sa.Column('description', sa.Text(), nullable=False),
-        sa.Column('difficulty', sa.Enum('EASY', 'MEDIUM', 'HARD', name='difficulty_enum', create_type=False), nullable=False),
+        sa.Column('difficulty', postgresql.ENUM('EASY', 'MEDIUM', 'HARD', name='difficulty_enum', create_type=False), nullable=False),
         sa.Column('time_limit_ms', sa.Integer(), nullable=False, server_default=sa.text('2000')),
         sa.Column('memory_limit_kb', sa.Integer(), nullable=False, server_default=sa.text('262144')),
         sa.Column('score_base', sa.Integer(), nullable=False, server_default=sa.text('100')),
@@ -66,7 +67,7 @@ def upgrade() -> None:
         sa.Column('language', sa.String(length=20), nullable=False),
         sa.Column('template_code', sa.Text(), nullable=False),
         sa.Column('function_name', sa.String(length=100), nullable=False),
-        sa.Column('arg_style', sa.Enum('kwargs', 'positional', 'single', name='arg_style_enum', create_type=False), nullable=False),
+        sa.Column('arg_style', postgresql.ENUM('kwargs', 'positional', 'single', name='arg_style_enum', create_type=False), nullable=False),
         sa.ForeignKeyConstraint(['problem_id'], ['problems.id']),
         sa.PrimaryKeyConstraint('id'),
         sa.UniqueConstraint('problem_id', 'language', name='uq_problem_template_lang'),

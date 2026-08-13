@@ -31,19 +31,24 @@ export const XEmptyState: React.FC<XEmptyStateProps> = ({
 }) => {
   return (
     <div className={cn("flex flex-col items-center justify-center h-full px-4 select-none", isIconOnly ? "py-4" : "py-8")}>
-      {/* X Logo */}
-      <div className={cn("relative", isIconOnly ? "mb-3" : "mb-5")}>
-        <div className={cn("rounded-2xl bg-gradient-to-br from-orange-600/35 to-amber-600/20 border border-orange-500/25 flex items-center justify-center shadow-lg", isIconOnly ? "w-10 h-10" : "w-14 h-14")}>
-          <span className={cn("font-black text-white tracking-tighter", isIconOnly ? "text-lg" : "text-2xl")} style={{ fontFamily: "'Inter', sans-serif" }}>X</span>
-        </div>
-        <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 rounded-full border-2 border-[#141416] flex items-center justify-center">
-          <span className="w-1.5 h-1.5 bg-white rounded-full" />
-        </span>
+      {/* Simple & Sleek X Logo */}
+      <div className={cn("flex items-center justify-center", isIconOnly ? "mb-3" : "mb-5")}>
+        <svg
+          viewBox="0 0 24 24"
+          className={cn(
+            "text-amber-400/90 hover:text-amber-300 transition-all duration-300 hover:scale-105",
+            isIconOnly ? "w-7 h-7" : "w-10 h-10"
+          )}
+          fill="none"
+        >
+          <path d="M18 6L6 18" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+          <path d="M6 6L18 18" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+        </svg>
       </div>
 
-      <h2 className="text-[15px] font-bold text-white mb-1.5">X is ready</h2>
+      <h2 className="text-[15px] font-bold tracking-tight text-gray-100 mb-1">X is ready</h2>
       {!isIconOnly && (
-        <p className="text-xs text-gray-500 text-center max-w-[200px] leading-relaxed mb-6">
+        <p className="text-xs text-gray-400 text-center max-w-[210px] leading-relaxed mb-6">
           Your AI coding companion. Ask anything about the problem, your code, or errors.
         </p>
       )}
@@ -55,11 +60,11 @@ export const XEmptyState: React.FC<XEmptyStateProps> = ({
             <button
               key={s.label}
               onClick={() => onSuggestion(s.prompt)}
-              className="x-suggestion-card group text-left p-2.5 rounded-xl border border-white/[0.06] bg-white/[0.03] hover:bg-white/[0.07] hover:border-orange-500/30 transition-all duration-200 cursor-pointer"
+              className="x-suggestion-card group text-left p-2.5 rounded-xl border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.06] hover:border-amber-500/30 transition-all duration-300 cursor-pointer"
             >
               <div className="flex items-center gap-2">
                 <span className="text-sm block leading-none">{s.icon}</span>
-                <span className="text-[11px] font-medium text-gray-300 group-hover:text-white transition-colors leading-tight block truncate">{s.label}</span>
+                <span className="text-[11px] font-medium text-gray-300 group-hover:text-amber-200 transition-colors leading-tight block truncate">{s.label}</span>
               </div>
             </button>
           ))}

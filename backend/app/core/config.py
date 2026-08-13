@@ -17,10 +17,10 @@ class Settings(BaseSettings):
 
     # ── Database ──────────────────────────────────────────────────────────────
     DATABASE_URL: str = (
-        "postgresql+asyncpg://xyz_platform:xyz_platform@localhost:5432/xyz_platform"
+        "postgresql+asyncpg://bugx:bugx@localhost:5432/bugx"
     )
     ALEMBIC_DATABASE_URL: str = (
-        "postgresql+psycopg2://xyz_platform:xyz_platform@localhost:5432/xyz_platform"
+        "postgresql+psycopg2://bugx:bugx@localhost:5432/bugx"
     )
 
     # ── Cache / Queue ─────────────────────────────────────────────────────────

@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect, startTransition } from 'react';
 import Editor, { type BeforeMount, type OnMount } from '@monaco-editor/react';
-import { RotateCcw, ChevronDown, Lightbulb, Maximize2, Play, CloudUpload, StickyNote, BookOpen } from 'lucide-react';
+import { RotateCcw, ChevronDown, Lightbulb, Maximize2, Play, CloudUpload, StickyNote, BookOpen, Sparkles } from 'lucide-react';
 import { cn } from '../../../shared/lib/cn';
 import { useX } from '../../x/XContext';
 import { useAuth } from '../../../features/auth/useAuth';
@@ -340,7 +340,7 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
     // Add Ask X shortcut & context menu action (Ctrl + Shift + X)
     editor.addAction({
       id: 'bugx-ask-x',
-      label: 'Ask X about selected code 🤖',
+      label: 'Ask X about selected code',
       keybindings: [monaco.KeyMod.CtrlCmd | monaco.KeyMod.Shift | monaco.KeyCode.KeyX],
       precondition: undefined,
       keybindingContext: undefined,
@@ -481,10 +481,16 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
                 if (!isXOpen) onToggleX?.();
                 window.dispatchEvent(new CustomEvent('bugx-ask-x-selection', { detail: { code: selectedCode } }));
               }}
-              className="flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#4F7DFF]/20 border border-[#4F7DFF]/40 text-[#4F7DFF] hover:bg-[#4F7DFF] hover:text-white transition-all text-xs font-bold shadow-sm cursor-pointer animate-fade-in"
+              className="group relative flex items-center gap-2 px-3 py-1 rounded-lg bg-gradient-to-r from-amber-500/10 via-amber-500/5 to-purple-500/10 hover:from-amber-500/20 hover:via-amber-500/15 hover:to-purple-500/20 border border-amber-500/30 hover:border-amber-400/60 text-gray-100 transition-all duration-300 shadow-lg shadow-amber-500/5 hover:shadow-amber-500/15 cursor-pointer select-none animate-fade-in active:scale-95"
               title="Ask X AI to explain or analyze selected code snippet"
             >
-              <span>🤖 Ask X ({selectedCode.split('\n').length} lines)</span>
+              <Sparkles className="w-3.5 h-3.5 text-amber-400 group-hover:rotate-12 transition-transform duration-300" />
+              <span className="text-xs font-semibold tracking-wide text-gray-100 group-hover:text-amber-200 transition-colors">
+                Ask X
+              </span>
+              <span className="px-1.5 py-0.5 text-[10px] font-mono font-medium bg-white/[0.08] group-hover:bg-amber-400/20 text-amber-300/90 rounded border border-white/[0.08] transition-colors">
+                {selectedCode.split('\n').length} {selectedCode.split('\n').length === 1 ? 'line' : 'lines'}
+              </span>
             </button>
           )}
 
@@ -493,17 +499,24 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({
             <button
               onClick={onToggleX}
               className={cn(
-                'relative flex items-center justify-center w-7 h-7 transition-all cursor-pointer select-none',
+                'group relative flex items-center justify-center w-7 h-7 bg-transparent hover:bg-white/[0.06] rounded-lg transition-all duration-200 cursor-pointer select-none',
                 isXOpen
-                  ? 'opacity-100'
-                  : 'opacity-65 hover:opacity-100'
+                  ? 'opacity-100 text-amber-400'
+                  : 'opacity-70 hover:opacity-100 text-gray-300 hover:text-amber-300'
               )}
               title="Toggle X AI"
             >
               {hasUnread && (
-                <span className="absolute top-0.5 right-0.5 w-1.5 h-1.5 bg-orange-400 rounded-full animate-pulse" />
+                <span className="absolute top-1 right-1 w-1.5 h-1.5 bg-amber-400 rounded-full animate-pulse ring-1 ring-black/40" />
               )}
-              <span className="font-black text-[12px] text-orange-500 animate-pulse">X</span>
+              <svg
+                viewBox="0 0 24 24"
+                className="w-4 h-4 transition-transform duration-300 group-hover:scale-110 drop-shadow-[0_0_6px_rgba(245,158,11,0.3)]"
+                fill="none"
+              >
+                <path d="M18 6L6 18" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+                <path d="M6 6L18 18" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+              </svg>
             </button>
           )}
 

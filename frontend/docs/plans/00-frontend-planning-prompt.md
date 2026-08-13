@@ -3,7 +3,7 @@
 Use this prompt before starting each frontend implementation phase.
 
 ```text
-You are implementing the XYZ Platform frontend on the `frontend` branch.
+You are implementing the bugX Platform frontend on the `frontend` branch.
 
 Goal:
 Build a LeetCode-style React SPA for the existing FastAPI backend. Implement one frontend phase at a time, keeping each phase independently usable, verified, and modular.

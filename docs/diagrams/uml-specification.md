@@ -1,4 +1,4 @@
-# UML Specification — XYZ Platform (v1)
+# UML Specification — bugX Platform (v1)
 
 Formal **class** and **state** diagrams for architecture review and implementation. Notation: [Mermaid](https://mermaid.js.org/) (renders on GitHub and most Markdown viewers).
 

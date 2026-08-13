@@ -86,9 +86,7 @@ export const XSettings: React.FC = () => {
 
       const isGet = provider.id === 'openrouter';
 
-      // Use verifyEndpoint (always the real external URL) to bypass the Vite
-      // proxy — browser → API CORS works, but Node.js proxy can fail on
-      // certain OS/network configurations even when the browser has access.
+      // Use verifyEndpoint (routes via Vite dev proxy in development to bypass CORS)
       const res = await fetch(provider.verifyEndpoint, {
         method: isGet ? 'GET' : 'POST',
         headers,

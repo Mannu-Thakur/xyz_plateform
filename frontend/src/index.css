@@ -1,4 +1,4 @@
-﻿@tailwind base;
+@tailwind base;
 @tailwind components;
 @tailwind utilities;
 
@@ -1532,3 +1532,129 @@ html.light .battle-input:focus {
 }
 .x-math-display .katex-display { margin: 0; }
 .x-math-display .katex { font-size: 1.05em; color: #e8eaf6; }
+
+/* ═══════════════════════════════════════════════
+   GLASSMORPHISM PROFILE PAGE ENHANCEMENTS
+   ═══════════════════════════════════════════════ */
+
+/* Animated gradient border shimmer */
+@keyframes border-shimmer {
+  0%   { background-position: 0% 50%; }
+  50%  { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Floating orb pulse */
+@keyframes orb-float {
+  0%, 100% { transform: translateY(0px) scale(1); opacity: 0.06; }
+  50%       { transform: translateY(-20px) scale(1.05); opacity: 0.10; }
+}
+
+/* Stat counter fade-up */
+@keyframes stat-rise {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* Glow pulse for online indicator */
+@keyframes glow-pulse {
+  0%, 100% { box-shadow: 0 0 6px rgba(52, 211, 153, 0.5); }
+  50%       { box-shadow: 0 0 14px rgba(52, 211, 153, 0.9), 0 0 30px rgba(52, 211, 153, 0.4); }
+}
+
+/* Glass card inner shine sweep */
+@keyframes shine-sweep {
+  0%   { transform: translateX(-100%) skewX(-15deg); opacity: 0; }
+  30%  { opacity: 0.06; }
+  70%  { opacity: 0.06; }
+  100% { transform: translateX(200%) skewX(-15deg); opacity: 0; }
+}
+
+/* ── Profile stat cards entrance ── */
+.profile-glass-card {
+  animation: stat-rise 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+/* ── Glass card hover shine ── */
+.glass-shine-effect {
+  position: relative;
+  overflow: hidden;
+}
+.glass-shine-effect::after {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 40%;
+  height: 200%;
+  background: linear-gradient(
+    105deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.04) 50%,
+    transparent 70%
+  );
+  transform: translateX(-100%) skewX(-15deg);
+  transition: none;
+}
+.glass-shine-effect:hover::after {
+  animation: shine-sweep 0.8s ease forwards;
+}
+
+/* ── Heatmap cell glows ── */
+.heatmap-active {
+  transition: transform 150ms ease, box-shadow 150ms ease;
+}
+.heatmap-active:hover {
+  transform: scale(1.4);
+  z-index: 10;
+}
+
+/* ── Custom scrollbar for heatmap ── */
+.profile-heatmap::-webkit-scrollbar {
+  height: 4px;
+}
+.profile-heatmap::-webkit-scrollbar-track {
+  background: transparent;
+}
+.profile-heatmap::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 2px;
+}
+.profile-heatmap::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+/* ── Avatar gradient ring animation ── */
+@keyframes ring-rotate {
+  from { background-position: 0% 50%; }
+  to   { background-position: 100% 50%; }
+}
+
+/* ── Backdrop blur fallback ── */
+@supports not (backdrop-filter: blur(1px)) {
+  .backdrop-blur-xl { background-color: rgba(10, 12, 16, 0.9) !important; }
+}
+
+/* ── Profile page floating particles (CSS-only) ── */
+.profile-particle {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: orb-float 8s ease-in-out infinite;
+}
+.profile-particle:nth-child(2) { animation-delay: -3s; animation-duration: 11s; }
+.profile-particle:nth-child(3) { animation-delay: -6s; animation-duration: 9s; }
+
+/* ── Section header gradient line ── */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, rgba(79,125,255,0.4), rgba(122,95,255,0.4), transparent);
+  border: none;
+  margin: 0;
+}
+
+/* ── Metric value glow text ── */
+.metric-glow-blue  { text-shadow: 0 0 20px rgba(79, 125, 255, 0.4); }
+.metric-glow-green { text-shadow: 0 0 20px rgba(16, 185, 129, 0.4); }
+.metric-glow-amber { text-shadow: 0 0 20px rgba(245, 158, 11, 0.4); }
+.metric-glow-rose  { text-shadow: 0 0 20px rgba(244, 63, 94, 0.4); }

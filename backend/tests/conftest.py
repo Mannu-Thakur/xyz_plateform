@@ -1,5 +1,5 @@
 """
-Test fixtures for the XYZ platform backend tests.
+Test fixtures for the bugX platform backend tests.
 Uses an in-memory SQLite-compatible approach: we override the DB URL with a
 test PostgreSQL database or use a fake async session.
 

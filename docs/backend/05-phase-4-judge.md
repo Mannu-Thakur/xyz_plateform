@@ -262,7 +262,7 @@ Extend `GET /api/v1/health` to include `judge0`: `"ok"` \| `"error"`. Probe `JUD
 
 ## docker-compose
 
-Extend **`backend/docker-compose.yml`** with Judge0 stack + `api` + `worker` from [09-env-security.md](./09-env-security.md). Use `judge0-server` + `judge0-workers`; set `JUDGE0_URL=http://judge0-server:2358` for API and XYZ worker containers. Run `docker compose` from `backend/`.
+Extend **`backend/docker-compose.yml`** with Judge0 stack + `api` + `worker` from [09-env-security.md](./09-env-security.md). Use `judge0-server` + `judge0-workers`; set `JUDGE0_URL=http://judge0-server:2358` for API and bugX worker containers. Run `docker compose` from `backend/`.
 
 ## Judge0 CE (v1 expectations)
 

@@ -1,16 +1,18 @@
+name: bugx
+
 services:
   postgres:
     image: postgres:16
     ports:
-      - "5432:5432"
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
     environment:
-      POSTGRES_USER: xyz_platform
-      POSTGRES_PASSWORD: xyz_platform
-      POSTGRES_DB: xyz_platform
+      POSTGRES_USER: bugx
+      POSTGRES_PASSWORD: bugx
+      POSTGRES_DB: bugx
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U xyz_platform"]
+      test: ["CMD-SHELL", "pg_isready -U bugx"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -18,7 +20,7 @@ services:
   redis:
     image: redis:7-alpine
     ports:
-      - "6379:6379"
+      - "${REDIS_HOST_PORT:-6379}:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -61,7 +63,7 @@ services:
       - judge0-db
       - judge0-redis
     ports:
-      - "2358:2358"
+      - "${JUDGE0_HOST_PORT:-2358}:2358"
     privileged: true
     restart: always
 
@@ -88,10 +90,12 @@ services:
 
   api:
     build: .
-    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir app
+    command: >-
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir app"
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "${API_HOST_PORT:-8000}:8000"
     volumes:
       - .:/app
     depends_on:
@@ -103,7 +107,7 @@ services:
         condition: service_started
     environment:
       ENV: development
-      DATABASE_URL: postgresql+asyncpg://xyz_platform:xyz_platform@postgres:5432/xyz_platform
+      DATABASE_URL: postgresql+asyncpg://bugx:bugx@postgres:5432/bugx
       REDIS_URL: redis://redis:6379/0
       JUDGE0_URL: http://judge0-server:2358
       USE_LOCAL_JUDGE: "true"
@@ -125,7 +129,7 @@ services:
         condition: service_started
     environment:
       ENV: development
-      DATABASE_URL: postgresql+asyncpg://xyz_platform:xyz_platform@postgres:5432/xyz_platform
+      DATABASE_URL: postgresql+asyncpg://bugx:bugx@postgres:5432/bugx
       REDIS_URL: redis://redis:6379/0
       JUDGE0_URL: http://judge0-server:2358
       USE_LOCAL_JUDGE: "true"
@@ -144,9 +148,40 @@ services:
         condition: service_healthy
     environment:
       ENV: development
-      DATABASE_URL: postgresql+asyncpg://xyz_platform:xyz_platform@postgres:5432/xyz_platform
+      DATABASE_URL: postgresql+asyncpg://bugx:bugx@postgres:5432/bugx
       REDIS_URL: redis://redis:6379/0
-      PYTHONUTF8: "1"
+  frontend:
+    image: node:22-alpine
+    working_dir: /app
+    command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
+    restart: unless-stopped
+    ports:
+      - "${FRONTEND_HOST_PORT:-5174}:5173"
+    volumes:
+      - ../frontend:/app
+      - /app/node_modules
+    environment:
+      VITE_API_URL: http://localhost:8000/api/v1
+      VITE_APP_NAME: bugX
+      # Feature flags
+      VITE_FEATURE_PUBLIC_PROFILES: "true"
+      VITE_FEATURE_RESUME_EXPORT: "true"
+      VITE_FEATURE_ANALYTICS: "true"
+      VITE_FEATURE_DAILY_CHALLENGE: "true"
+      VITE_FEATURE_TOPIC_MASTERY: "false"
+      VITE_FEATURE_BADGES: "false"
+      VITE_FEATURE_RATING_GRAPH: "false"
+      VITE_FEATURE_SIMILAR_PROBLEMS: "false"
+      VITE_FEATURE_COLLECTIONS: "false"
+      VITE_FEATURE_ROADMAPS: "false"
+      VITE_FEATURE_COMPANY_PREP: "false"
+      VITE_FEATURE_VISUALIZER: "false"
+      VITE_FEATURE_FORUM: "false"
+      VITE_FEATURE_FRIENDS: "false"
+      VITE_FEATURE_COMMUNITY_CHALLENGES: "false"
+      VITE_FEATURE_NOTIFICATIONS: "false"
+    depends_on:
+      - api
 
 volumes:
   judge0-data:

@@ -33,7 +33,12 @@ class UserService:
         if "avatar_url" in fields_set and req.avatar_url != current_user.avatar_url:
             current_user.avatar_url = req.avatar_url
 
-        for field in ("leetcode_url", "github_url", "linkedin_url", "portfolio_url", "full_name", "bio", "location"):
+        for field in (
+            "leetcode_url", "codeforces_url", "gfg_url",
+            "leetcode_username", "codeforces_username", "gfg_username",
+            "github_url", "linkedin_url", "portfolio_url",
+            "full_name", "bio", "location"
+        ):
             if field in fields_set and getattr(req, field) != getattr(current_user, field):
                 setattr(current_user, field, getattr(req, field))
 

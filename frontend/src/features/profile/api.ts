@@ -5,6 +5,13 @@ import type { Paginated } from '../../shared/lib/api';
 
 // ─── Types ──────────────────────────────────────────────────────────────────
 
+export interface DailyDetail {
+  total: number;
+  accepted: number;
+  topics: string[];
+  problems: string[];
+}
+
 export interface UserStats {
   total_solved: number;
   easy_solved: number;
@@ -15,6 +22,7 @@ export interface UserStats {
   best_streak: number;
   last_active_date: string | null;
   submission_activity?: Record<string, number> | null;
+  daily_details?: Record<string, DailyDetail> | null;
   battles_played?: number;
   battles_won?: number;
 }
@@ -58,11 +66,53 @@ async function profileRequest<T>(path: string): Promise<T> {
   return res.json();
 }
 
+export interface RatingPoint {
+  rating: number;
+  label?: string;
+  date?: string;
+}
+
+export interface PlatformStatItem {
+  connected: boolean;
+  platform?: string;
+  username?: string;
+  profile_url?: string;
+  total_solved?: number;
+  easy_solved?: number;
+  medium_solved?: number;
+  hard_solved?: number;
+  ranking?: number;
+  reputation?: number;
+  star_rating?: number;
+  rating?: number;
+  max_rating?: number;
+  rank?: string;
+  max_rank?: string;
+  avatar?: string;
+  contribution?: number;
+  coding_score?: number;
+  monthly_score?: number;
+  streak?: number;
+  rating_history?: RatingPoint[];
+  error?: string;
+}
+
+export interface PlatformStats {
+  leetcode: PlatformStatItem;
+  codeforces: PlatformStatItem;
+  gfg: PlatformStatItem;
+}
+
 // ─── Endpoint Functions ───────────────────────────────────────────────────────
 
 /** GET /api/v1/users/me/stats */
 export async function fetchUserStats(): Promise<UserStats> {
   return profileRequest<UserStats>('/users/me/stats');
+}
+
+/** GET /api/v1/users/me/platform-stats */
+export async function fetchPlatformStats(): Promise<PlatformStats> {
+  return profileRequest<PlatformStats>('/users/me/platform-stats');
 }
 
 /** GET /api/v1/users/me/submissions?page=N&limit=N */
@@ -84,11 +134,17 @@ export interface PublicProfileData {
     avatarUrl: string | null;
     createdAt: string | null;
     leetcodeUrl: string | null;
+    codeforcesUrl?: string | null;
+    gfgUrl?: string | null;
+    leetcodeUsername?: string | null;
+    codeforcesUsername?: string | null;
+    gfgUsername?: string | null;
     githubUrl: string | null;
     linkedinUrl: string | null;
     portfolioUrl: string | null;
   };
   stats: UserStats;
+  platformStats?: PlatformStats;
   submissions: SubmissionSummary[];
 }
 

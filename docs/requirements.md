@@ -1,4 +1,4 @@
-# XYZ Platform — Requirements (v1)
+# bugX Platform — Requirements (v1)
 
 Product requirements for the LeetCode-inspired coding judge. Implementation detail lives in [backend/](./backend/README.md) phase docs.
 
@@ -67,7 +67,7 @@ Product requirements for the LeetCode-inspired coding judge. Implementation deta
 | Security | bcrypt passwords, JWT from env, user code only in Judge0 sandbox |
 | Performance | Sequential Judge0 calls v1; leaderboard cache TTL 60s |
 | Reliability | Stale `RUNNING` reclaim; idempotent judge via delete+reinsert results |
-| Ops | Single XYZ worker replica v1; Judge0 server + Judge0 workers required; `scripts/rescore_submission.py` for scoring recovery |
+| Ops | Single bugX worker replica v1; Judge0 server + Judge0 workers required; `scripts/rescore_submission.py` for scoring recovery |
 | Data | PostgreSQL relational schema; Alembic migrations per phase |
 
 ## 5. Data requirements

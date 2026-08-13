@@ -44,16 +44,64 @@ class UserController:
         await repo.recompute_total_score(current_user.id)
         stats = await repo.get_by_user_id(current_user.id)
 
-        # Query submission timestamps for the last year
+        # Query submissions for the last year with problem & tags/topics
+        from app.models.problem import Problem
+        from sqlalchemy.orm import selectinload
+
         one_year_ago = datetime.now(timezone.utc) - timedelta(days=366)
         stmt = (
-            select(Submission.created_at)
-            .where(Submission.user_id == current_user.id)
-            .where(Submission.created_at >= one_year_ago)
+            select(Submission)
+            .where(
+                Submission.user_id == current_user.id,
+                Submission.created_at >= one_year_ago,
+                Submission.run_samples_only == False,
+            )
+            .options(
+                selectinload(Submission.problem).selectinload(Problem.tags),
+                selectinload(Submission.problem).selectinload(Problem.topics)
+            )
         )
         res = await self.db.execute(stmt)
-        timestamps = res.scalars().all()
-        activity = Counter(t.strftime("%Y-%m-%d") for t in timestamps if t)
+        submissions = list(res.scalars().all())
+
+        daily_map = {}
+        for sub in submissions:
+            if not sub.created_at:
+                continue
+            date_str = sub.created_at.strftime("%Y-%m-%d")
+            if date_str not in daily_map:
+                daily_map[date_str] = {
+                    "total": 0,
+                    "accepted": 0,
+                    "topics": set(),
+                    "problems": set()
+                }
+            daily_map[date_str]["total"] += 1
+            status_str = sub.status.value if hasattr(sub.status, "value") else str(sub.status)
+            if status_str.upper() == "ACCEPTED":
+                daily_map[date_str]["accepted"] += 1
+
+            if sub.problem:
+                if sub.problem.title:
+                    daily_map[date_str]["problems"].add(sub.problem.title)
+                for tag in (sub.problem.tags or []):
+                    if tag.name:
+                        daily_map[date_str]["topics"].add(tag.name)
+                for topic in (sub.problem.topics or []):
+                    if topic.name:
+                        daily_map[date_str]["topics"].add(topic.name)
+
+        daily_details = {
+            d: {
+                "total": data["total"],
+                "accepted": data["accepted"],
+                "topics": sorted(list(data["topics"])),
+                "problems": sorted(list(data["problems"]))
+            }
+            for d, data in daily_map.items()
+        }
+
+        activity = {d: data["total"] for d, data in daily_details.items()}
 
         # Query battles played and won
         battle_stmt = (
@@ -126,6 +174,7 @@ class UserController:
                 "total_score": 0, "current_streak": 0, "best_streak": 0,
                 "last_active_date": None,
                 "submission_activity": dict(activity),
+                "daily_details": daily_details,
                 "battles_played": battles_played,
                 "battles_won": battles_won
             }
@@ -139,6 +188,7 @@ class UserController:
             "best_streak": stats.best_streak,
             "last_active_date": stats.last_active_date,
             "submission_activity": dict(activity),
+            "daily_details": daily_details,
             "battles_played": battles_played,
             "battles_won": battles_won
         }
@@ -150,7 +200,13 @@ class UserController:
         offset = (page - 1) * limit
 
         # count
-        count_stmt = select(func.count(Submission.id)).where(Submission.user_id == current_user.id)
+        count_stmt = (
+            select(func.count(Submission.id))
+            .where(
+                Submission.user_id == current_user.id,
+                Submission.run_samples_only == False,
+            )
+        )
         if problem_id:
             count_stmt = count_stmt.where(Submission.problem_id == problem_id)
         total = (await self.db.execute(count_stmt)).scalar() or 0
@@ -158,7 +214,10 @@ class UserController:
         # rows
         stmt = (
             select(Submission)
-            .where(Submission.user_id == current_user.id)
+            .where(
+                Submission.user_id == current_user.id,
+                Submission.run_samples_only == False,
+            )
             .order_by(Submission.created_at.desc())
             .offset(offset)
             .limit(limit)

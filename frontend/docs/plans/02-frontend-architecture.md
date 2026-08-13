@@ -217,5 +217,5 @@ Optional later:
 
 ```text
 VITE_ENABLE_API_FIXTURES=false
-VITE_APP_NAME=XYZ Platform
+VITE_APP_NAME=bugX
 ```

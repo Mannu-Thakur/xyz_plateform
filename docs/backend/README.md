@@ -1,6 +1,6 @@
-# XYZ Platform — Backend Plan Index
+# bugX Platform — Backend Plan Index
 
-LeetCode-inspired coding judge (**xyz_plateform**). **Stack:** FastAPI · PostgreSQL · Redis · Judge0 (Docker) · JWT
+LeetCode-inspired coding judge (**bugX**). **Stack:** FastAPI · PostgreSQL · Redis · Judge0 (Docker) · JWT
 
 **Also see:** [../README.md](../README.md) (docs index) · [../requirements.md](../requirements.md) · [../diagrams/uml-specification.md](../diagrams/uml-specification.md) · [../comparison/mern-vs-fastapi.md](../comparison/mern-vs-fastapi.md) · [../analysis/plan-readiness-review.md](../analysis/plan-readiness-review.md)
 
@@ -105,7 +105,7 @@ Single source of truth — do not duplicate elsewhere.
 
 ## Repo layout (backend)
 
-This repository root is **xyz_plateform**. Application code will live under:
+This repository root is **bugX**. Application code will live under:
 
 ```
 backend/
@@ -126,7 +126,7 @@ backend/
 └── requirements.txt
 ```
 
-Phase 4+ compose uses `backend/Dockerfile` for the `api` and XYZ `worker` images.
+Phase 4+ compose uses `backend/Dockerfile` for the `api` and bugX `worker` images.
 
 ## Plan status
 

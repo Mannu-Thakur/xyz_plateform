@@ -28,6 +28,9 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, onCl
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
 
+  const [codeforcesUrl, setCodeforcesUrl] = useState('');
+  const [gfgUrl, setGfgUrl] = useState('');
+
   useEffect(() => {
     if (user) {
       setUsername(user.username || '');
@@ -36,6 +39,8 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, onCl
       setAvatarPreviewUrl('');
       setAvatarUrlDirty(false);
       setLeetcodeUrl(user.leetcodeUrl || '');
+      setCodeforcesUrl(user.codeforcesUrl || '');
+      setGfgUrl(user.gfgUrl || '');
       setGithubUrl(user.githubUrl || '');
       setLinkedinUrl(user.linkedinUrl || '');
       setPortfolioUrl(user.portfolioUrl || '');
@@ -108,10 +113,29 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, onCl
         await uploadAvatar(avatarFile);
       }
 
+      const cleanHandle = (val: string) => {
+        if (!val) return null;
+        const cleaned = val.trim().replace(/[\?#].*$/, '').replace(/\/$/, '');
+        const parts = cleaned.split('/').filter(Boolean);
+        const skip = new Set(['http:', 'https:', 'www.leetcode.com', 'leetcode.com', 'u', 'user', 'profile', 'www.codeforces.com', 'codeforces.com', 'geeksforgeeks.org', 'auth.geeksforgeeks.org', 'www.geeksforgeeks.org', 'account', 'settings', 'edit', 'home']);
+        for (let i = parts.length - 1; i >= 0; i--) {
+          const token = parts[i].replace(/^@/, '').trim();
+          if (!skip.has(token.toLowerCase()) && !token.startsWith('http')) {
+            return token;
+          }
+        }
+        return cleaned.replace(/^@/, '');
+      };
+
       await updateProfile({
         username,
         ...(avatarUrlDirty && !avatarFile ? { avatarUrl: avatarUrl || null } : {}),
         leetcodeUrl: leetcodeUrl || null,
+        codeforcesUrl: codeforcesUrl || null,
+        gfgUrl: gfgUrl || null,
+        leetcodeUsername: leetcodeUrl ? cleanHandle(leetcodeUrl) : null,
+        codeforcesUsername: codeforcesUrl ? cleanHandle(codeforcesUrl) : null,
+        gfgUsername: gfgUrl ? cleanHandle(gfgUrl) : null,
         githubUrl: githubUrl || null,
         linkedinUrl: linkedinUrl || null,
         portfolioUrl: portfolioUrl || null,
@@ -231,39 +255,58 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({ isOpen, onCl
           placeholder="https://example.com/avatar.png"
         />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <Input
-            label="LeetCode"
-            type="url"
-            value={leetcodeUrl}
-            onChange={(e) => setLeetcodeUrl(e.target.value)}
-            icon={<Link className="w-4 h-4" />}
-            placeholder="https://leetcode.com/u/username"
-          />
-          <Input
-            label="GitHub"
-            type="url"
-            value={githubUrl}
-            onChange={(e) => setGithubUrl(e.target.value)}
-            icon={<Terminal className="w-4 h-4" />}
-            placeholder="https://github.com/username"
-          />
-          <Input
-            label="LinkedIn"
-            type="url"
-            value={linkedinUrl}
-            onChange={(e) => setLinkedinUrl(e.target.value)}
-            icon={<Code2 className="w-4 h-4" />}
-            placeholder="https://linkedin.com/in/username"
-          />
-          <Input
-            label="Portfolio / Other"
-            type="url"
-            value={portfolioUrl}
-            onChange={(e) => setPortfolioUrl(e.target.value)}
-            icon={<Link className="w-4 h-4" />}
-            placeholder="https://your-site.com"
-          />
+        <div className="space-y-3">
+          <h4 className="text-xs font-bold uppercase text-gray-400 tracking-wider">Coding & Social Profiles</h4>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <Input
+              label="LeetCode Profile / Username"
+              type="text"
+              value={leetcodeUrl}
+              onChange={(e) => setLeetcodeUrl(e.target.value)}
+              icon={<Link className="w-4 h-4 text-amber-400" />}
+              placeholder="username or https://leetcode.com/u/username"
+            />
+            <Input
+              label="Codeforces Handle / URL"
+              type="text"
+              value={codeforcesUrl}
+              onChange={(e) => setCodeforcesUrl(e.target.value)}
+              icon={<Link className="w-4 h-4 text-blue-400" />}
+              placeholder="handle or https://codeforces.com/profile/handle"
+            />
+            <Input
+              label="GeeksForGeeks Handle / URL"
+              type="text"
+              value={gfgUrl}
+              onChange={(e) => setGfgUrl(e.target.value)}
+              icon={<Link className="w-4 h-4 text-emerald-400" />}
+              placeholder="username or https://geeksforgeeks.org/user/username"
+            />
+            <Input
+              label="GitHub"
+              type="url"
+              value={githubUrl}
+              onChange={(e) => setGithubUrl(e.target.value)}
+              icon={<Terminal className="w-4 h-4" />}
+              placeholder="https://github.com/username"
+            />
+            <Input
+              label="LinkedIn"
+              type="url"
+              value={linkedinUrl}
+              onChange={(e) => setLinkedinUrl(e.target.value)}
+              icon={<Code2 className="w-4 h-4" />}
+              placeholder="https://linkedin.com/in/username"
+            />
+            <Input
+              label="Portfolio / Other"
+              type="url"
+              value={portfolioUrl}
+              onChange={(e) => setPortfolioUrl(e.target.value)}
+              icon={<Link className="w-4 h-4" />}
+              placeholder="https://your-site.com"
+            />
+          </div>
         </div>
       </form>
     </Modal>

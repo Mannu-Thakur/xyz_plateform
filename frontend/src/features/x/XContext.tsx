@@ -167,10 +167,8 @@ export const XProvider: React.FC<{ children: React.ReactNode }> = ({ children })
   const [selectedModelId, setSelectedModelIdState] = useState<string>(
     () => localStorage.getItem(STORAGE_KEY_MODEL) || DEFAULT_MODEL_ID
   );
-  // Restore the persisted panel open state from localStorage
-  const [isOpen, setIsOpen] = useState<boolean>(
-    () => localStorage.getItem('x_panel_open') === 'true'
-  );
+  // X AI Panel starts closed by default until opened by user
+  const [isOpen, setIsOpen] = useState<boolean>(false);
   const [isStreaming, setIsStreaming] = useState(false);
   const abortControllerRef = useRef<AbortController | null>(null);
 

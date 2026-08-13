@@ -1,10 +1,10 @@
-# Stack Comparison — MERN vs FastAPI (XYZ Platform)
+# Stack Comparison — MERN vs FastAPI (bugX Platform)
 
-Decision record for **xyz_plateform** backend technology.
+Decision record for **bugX** backend technology.
 
 ## Summary
 
-**Chosen for xyz_plateform:** FastAPI + PostgreSQL + Redis + Judge0 + React frontend.
+**Chosen for bugX:** FastAPI + PostgreSQL + Redis + Judge0 + React frontend.
 
 **Not chosen:** MERN (MongoDB + Express + React + Node.js) for the coding-judge backend.
 
@@ -35,7 +35,7 @@ Decision record for **xyz_plateform** backend technology.
 
 ## Frontend note
 
-XYZ Platform still uses **React** for the UI (Phase 6). Only the **API server** is Python/FastAPI — not a MERN backend.
+bugX Platform still uses **React** for the UI (Phase 6). Only the **API server** is Python/FastAPI — not a MERN backend.
 
 ## Related
 

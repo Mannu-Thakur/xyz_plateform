@@ -103,7 +103,7 @@ Use this after any plan edit. **All items must pass** before calling the plan im
 | 45 | Judge0 compose includes **server + workers**; `/workers` availability check documented | pass |
 | 46 | Phase 3 admin validation rejects invalid numeric scoring/judge fields | pass |
 | 47 | Test-case validation requires JSON `input` / `expected_output`, `weight >= 1`, and unique `order_index` | pass |
-| 48 | Phase 6 startup order runs migrations + seed before starting `api` / XYZ `worker` | pass |
+| 48 | Phase 6 startup order runs migrations + seed before starting `api` / bugX `worker` | pass |
 | 49 | `email-validator` dependency present for Pydantic `EmailStr` | pass |
 | 50 | `backend/Dockerfile` required/present before compose `api` / `worker` use `build: .` | pass |
 

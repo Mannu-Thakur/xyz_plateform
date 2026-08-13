@@ -16,6 +16,11 @@ class UserProfile(UserBase):
     role: str
     avatar_url: Optional[str] = None
     leetcode_url: Optional[str] = None
+    codeforces_url: Optional[str] = None
+    gfg_url: Optional[str] = None
+    leetcode_username: Optional[str] = None
+    codeforces_username: Optional[str] = None
+    gfg_username: Optional[str] = None
     github_url: Optional[str] = None
     linkedin_url: Optional[str] = None
     portfolio_url: Optional[str] = None
@@ -32,6 +37,11 @@ class UserUpdate(BaseModel):
     username: Optional[str] = Field(None, min_length=3, max_length=50, pattern=r"^[a-zA-Z0-9_-]+$")
     avatar_url: Optional[str] = Field(None, max_length=2048)
     leetcode_url: Optional[str] = Field(None, max_length=512)
+    codeforces_url: Optional[str] = Field(None, max_length=512)
+    gfg_url: Optional[str] = Field(None, max_length=512)
+    leetcode_username: Optional[str] = Field(None, max_length=255)
+    codeforces_username: Optional[str] = Field(None, max_length=255)
+    gfg_username: Optional[str] = Field(None, max_length=255)
     github_url: Optional[str] = Field(None, max_length=512)
     linkedin_url: Optional[str] = Field(None, max_length=512)
     portfolio_url: Optional[str] = Field(None, max_length=512)

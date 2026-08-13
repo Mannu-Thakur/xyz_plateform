@@ -106,6 +106,14 @@ async def get_my_submissions(
     return await controller.get_my_submissions(current_user, page, limit, problem_id)
 
 
+@router.get("/me/platform-stats")
+async def get_my_platform_stats(
+    current_user: User = Depends(get_current_active_user),
+) -> Any:
+    from app.services.platform_stats_service import fetch_user_platform_stats
+    return await fetch_user_platform_stats(current_user)
+
+
 @router.get("/profile/{username}")
 async def get_public_profile(
     username: str,
@@ -113,16 +121,18 @@ async def get_public_profile(
 ) -> Any:
     from app.repositories.user_repo import UserRepo
     from fastapi import HTTPException
-    
+    from app.services.platform_stats_service import fetch_user_platform_stats
+
     repo = UserRepo(db)
     user = await repo.get_by_username(username)
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
-        
+
     controller = UserController(db)
     stats = await controller.get_my_stats(user)
     submissions = await controller.get_my_submissions(user, page=1, limit=10)
-    
+    platform_stats = await fetch_user_platform_stats(user)
+
     return {
         "user": {
             "username": user.username,
@@ -132,11 +142,18 @@ async def get_public_profile(
             "avatarUrl": user.avatar_url,
             "createdAt": user.created_at.isoformat() if user.created_at else None,
             "leetcodeUrl": user.leetcode_url,
+            "codeforcesUrl": getattr(user, "codeforces_url", None),
+            "gfgUrl": getattr(user, "gfg_url", None),
+            "leetcodeUsername": getattr(user, "leetcode_username", None),
+            "codeforcesUsername": getattr(user, "codeforces_username", None),
+            "gfgUsername": getattr(user, "gfg_username", None),
             "githubUrl": user.github_url,
             "linkedinUrl": user.linkedin_url,
             "portfolioUrl": user.portfolio_url,
         },
         "stats": stats,
+        "platformStats": platform_stats,
         "submissions": submissions["items"]
     }
+
 

@@ -175,6 +175,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       setUser(updatedUser);
       cacheUser(updatedUser);
       queryClient.invalidateQueries({ queryKey: ['me'] });
+      queryClient.invalidateQueries({ queryKey: ['platform-stats'] });
+      queryClient.invalidateQueries({ queryKey: ['user-stats'] });
       toast.success('Profile updated successfully.');
     } catch (err) {
       const apiErr = err as ApiError;

@@ -215,8 +215,11 @@ export const XPanel: React.FC<XPanelProps> = ({
       >
         {/* Top: X logo */}
         <div className="flex flex-col items-center gap-4">
-          <div className="w-7 h-7 flex items-center justify-center group-hover:scale-105 transition-transform text-gray-300">
-            <span className="text-[15px] font-black tracking-wider">X</span>
+          <div className="w-7 h-7 flex items-center justify-center group-hover:scale-110 transition-transform text-amber-400">
+            <svg viewBox="0 0 24 24" className="w-4.5 h-4.5" fill="none">
+              <path d="M18 6L6 18" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+              <path d="M6 6L18 18" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+            </svg>
           </div>
           <span className="text-[10px] font-bold text-gray-500 tracking-widest [writing-mode:vertical-lr] uppercase whitespace-nowrap">
             X AI Panel
@@ -243,8 +246,11 @@ export const XPanel: React.FC<XPanelProps> = ({
       >
         {/* Left: X logo + model badge */}
         <div className="flex items-center gap-1.5">
-          <div className="w-5 h-5 flex items-center justify-center text-gray-300">
-            <span className="text-[14px] font-black tracking-wider">X</span>
+          <div className="w-5 h-5 flex items-center justify-center text-amber-400">
+            <svg viewBox="0 0 24 24" className="w-3.5 h-3.5" fill="none">
+              <path d="M18 6L6 18" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+              <path d="M6 6L18 18" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+            </svg>
           </div>
           {!isCompact && !isIconOnly && currentModel && (
             <span className="text-[10px] font-semibold text-gray-500 truncate max-w-[100px]">

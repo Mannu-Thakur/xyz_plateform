@@ -34,10 +34,13 @@ def create_app() -> FastAPI:
 
         # Auto-create tables and auto-seed the database if empty on startup
         try:
-            from app.core.database import AsyncSessionLocal
+            from app.core.database import AsyncSessionLocal, engine
             from app.services.seeder_service import seed_problems
 
-            # Schema changes are strictly managed via Alembic migrations.
+            async with engine.begin() as conn:
+                await _ensure_user_profile_columns(conn)
+                await _ensure_battle_columns(conn)
+                await _ensure_problem_columns(conn)
 
             # Seed base problems
             async with AsyncSessionLocal() as session:
@@ -67,14 +70,6 @@ def create_app() -> FastAPI:
         description="bugX Backend API",
         version="1.0.0",
         lifespan=lifespan,
-    )
-
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=settings.cors_origins,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
     )
 
     public_uploads = storage_root() / "public"
@@ -119,6 +114,16 @@ def create_app() -> FastAPI:
             )
 
         return await call_next(request)
+
+    # Added after @app.middleware("http") so CORSMiddleware is outermost and handles CORS on all responses
+    app.add_middleware(
+        CORSMiddleware,
+        allow_origins=settings.cors_origins,
+        allow_origin_regex=r"http://(localhost|127\.0\.0\.1)(:\d+)?",
+        allow_credentials=True,
+        allow_methods=["*"],
+        allow_headers=["*"],
+    )
 
     from app.routers.auth import router as auth_router
     from app.routers.oauth import router as oauth_router
@@ -268,7 +273,7 @@ async def _ensure_battle_columns(conn) -> None:
 
 
 async def _ensure_problem_columns(conn) -> None:
-    """Auto-add comparison_mode column to problems table if it doesn't exist."""
+    """Auto-add comparison_mode and hints columns to problems table if missing, and ensure user_files table."""
     def existing_cols(sync_conn) -> set[str]:
         try:
             return {column["name"] for column in inspect(sync_conn).get_columns("problems")}
@@ -276,11 +281,21 @@ async def _ensure_problem_columns(conn) -> None:
             return set()
 
     existing = await conn.run_sync(existing_cols)
-    if "comparison_mode" not in existing and existing:
-        try:
-            await conn.execute(text("ALTER TABLE problems ADD COLUMN comparison_mode VARCHAR(50) DEFAULT 'strict' NOT NULL"))
-        except Exception:
-            pass
+    if existing:
+        if "comparison_mode" not in existing:
+            try:
+                await conn.execute(text("ALTER TABLE problems ADD COLUMN comparison_mode VARCHAR(50) DEFAULT 'strict' NOT NULL"))
+            except Exception:
+                pass
+        if "hints" not in existing:
+            try:
+                await conn.execute(text("ALTER TABLE problems ADD COLUMN hints TEXT"))
+            except Exception:
+                pass
+
+    # Ensure user_files table exists
+    from app.models.user_file import UserFile
+    await conn.run_sync(lambda sync_conn: UserFile.__table__.create(sync_conn, checkfirst=True))
 
 
 def _client_ip(request: Request) -> str:

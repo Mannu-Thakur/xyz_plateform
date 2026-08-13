@@ -1,6 +1,6 @@
 // Phase 5 — TanStack Query hooks for profile data
 import { useQuery } from '@tanstack/react-query';
-import { fetchUserStats, fetchUserSubmissions, fetchPublicProfile } from './api';
+import { fetchUserStats, fetchPlatformStats, fetchUserSubmissions, fetchPublicProfile } from './api';
 
 /** Fetch the authenticated user's stats. Stale for 60 s. */
 export function useUserStats() {
@@ -8,6 +8,16 @@ export function useUserStats() {
     queryKey: ['user-stats'],
     queryFn: () => fetchUserStats(),
     staleTime: 5_000,
+    retry: 1,
+  });
+}
+
+/** Fetch live platform stats (LeetCode, Codeforces, GFG). */
+export function usePlatformStats() {
+  return useQuery({
+    queryKey: ['platform-stats'],
+    queryFn: () => fetchPlatformStats(),
+    staleTime: 60_000,
     retry: 1,
   });
 }

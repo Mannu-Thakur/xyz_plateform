@@ -29,7 +29,7 @@ class Submission(Base):
     problem_id = Column(UUID(as_uuid=True), ForeignKey("problems.id", ondelete="CASCADE"), nullable=False, index=True)
     language = Column(String(20), nullable=False)
     source_code = Column(Text, nullable=False)
-    status = Column(Enum(SubmissionStatus), default=SubmissionStatus.PENDING, nullable=False)
+    status = Column(Enum(SubmissionStatus, name="submission_status", create_type=False), default=SubmissionStatus.PENDING, nullable=False)
     passed_count = Column(Integer, default=0, nullable=False)
     total_count = Column(Integer, default=0, nullable=False)
     passed_weight = Column(Integer, default=0, nullable=False)

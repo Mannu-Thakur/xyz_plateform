@@ -129,7 +129,7 @@ Return ONLY valid JSON matching this exact structure:
         text_lower = text.lower()
         words = set(re.findall(r"\b[a-z0-9+#.-]+\b", text_lower))
 
-        # Skill categories dictionary
+        # Core technical skill dictionary
         tech_keywords = {
             "python", "javascript", "typescript", "react", "node", "express", "fastapi", "django",
             "flask", "c++", "cpp", "java", "sql", "postgresql", "mongodb", "redis", "docker",
@@ -147,23 +147,41 @@ Return ONLY valid JSON matching this exact structure:
         found_verbs = action_verbs.intersection(words)
 
         # Numbers / Metrics test
-        has_metrics = len(re.findall(r"\b\d+([%kKmM]|\s*percent|\s*ms|\s*users)?\b", text)) > 3
+        has_metrics = len(re.findall(r"\b\d+([%kKmM]|\s*percent|\s*ms|\s*users)?\b", text)) > 2
 
-        # ATS calculations
+        # Role-specific missing keyword targeting
+        role_specific_keywords = {
+            "frontend": {"react", "typescript", "javascript", "css", "html", "tailwind", "redux", "next.js"},
+            "backend": {"python", "fastapi", "django", "node", "postgresql", "mongodb", "redis", "rest", "graphql", "docker"},
+            "full": {"react", "typescript", "node", "postgresql", "python", "fastapi", "docker", "git", "rest"},
+            "devops": {"docker", "kubernetes", "aws", "ci/cd", "gcp", "azure", "git", "linux"},
+            "data": {"python", "sql", "postgresql", "mongodb", "pandas", "data structures", "algorithms"},
+        }
+        
+        target_lower = target_role.lower()
+        role_targets = set()
+        for r_key, r_words in role_specific_keywords.items():
+            if r_key in target_lower:
+                role_targets.update(r_words)
+
+        if not role_targets:
+            role_targets = tech_keywords
+
+        missing = sorted(list(role_targets - set(found_skills)))[:6]
+
+        # ATS calculations based on candidate's actual extracted content
         skills_score = min(100, int((len(found_skills) / 12.0) * 100))
         impact_score = min(100, int((len(found_verbs) * 10) + (35 if has_metrics else 10)))
-        formatting_score = 85 if len(text) > 400 else 60
+        formatting_score = 85 if len(text) > 350 else 60
         ats_score = int((skills_score * 0.4) + (impact_score * 0.4) + (formatting_score * 0.2))
-
-        missing = sorted(list(tech_keywords - set(found_skills)))[:6]
 
         strengths = []
         if len(found_skills) >= 6:
             strengths.append(f"Strong technical skill set including {', '.join(found_skills[:4])}.")
         if has_metrics:
             strengths.append("Includes quantifiable metrics and achievements in experience descriptions.")
-        if len(found_verbs) >= 4:
-            strengths.append("Uses strong action verbs to describe accomplishments.")
+        if len(found_verbs) >= 3:
+            strengths.append("Uses active technical verbs to describe project accomplishments.")
         if not strengths:
             strengths.append("Clear structural layout with recognizable technical experience sections.")
 
@@ -177,9 +195,38 @@ Return ONLY valid JSON matching this exact structure:
 
         recommendations = [
             f"Add relevant keywords missing for {target_role}: {', '.join(missing[:4])}.",
-            "Quantify bullet points with impact metrics (e.g. 'Improved API response time by 40%').",
+            "Quantify bullet points with impact metrics (e.g. 'Improved API response time by 35%').",
             "Ensure technical skills are explicitly categorized into Languages, Frameworks, and Tools."
         ]
+
+        # Extract real candidate bullet points / experience lines directly from uploaded text
+        candidate_bullets = []
+        raw_lines = [l.strip() for l in text.split('\n') if l.strip()]
+        for line in raw_lines:
+            cleaned = re.sub(r'^[•\-\*\u2022\u2023\u25e6\u2043\u2219]\s*', '', line).strip()
+            if len(cleaned.split()) >= 5 and len(cleaned) <= 160:
+                if not re.match(r'^(education|experience|projects|skills|summary|contact|name|email|phone|linkedin|github|software engineer|developer)', cleaned, re.I):
+                    candidate_bullets.append(cleaned)
+
+        bullet_improvements = []
+        if candidate_bullets:
+            for bullet in candidate_bullets[:2]:
+                bullet_skills = [s.capitalize() for s in found_skills if s.lower() in bullet.lower()]
+                skill_str = ", ".join(bullet_skills[:2]) if bullet_skills else (found_skills[0].capitalize() if found_skills else "software engineering")
+                
+                improved = f"Engineered and deployed scalable solutions leveraging {skill_str}, optimizing performance and reducing latency by 35%."
+                bullet_improvements.append({
+                    "original": bullet,
+                    "improved": improved,
+                    "reason": "Replaces passive/descriptive phrasing with active engineering verbs and quantified metrics."
+                })
+
+        if not bullet_improvements:
+            bullet_improvements.append({
+                "original": "Worked on backend APIs and database queries.",
+                "improved": f"Architected high-throughput RESTful APIs with {found_skills[0].capitalize() if found_skills else 'FastAPI'} and PostgreSQL, reducing query latency by 35%.",
+                "reason": "Replaces passive language with active verbs and quantifiable performance metrics."
+            })
 
         return {
             "success": True,
@@ -195,11 +242,5 @@ Return ONLY valid JSON matching this exact structure:
             "strengths": strengths,
             "weaknesses": weaknesses,
             "actionable_recommendations": recommendations,
-            "bullet_improvements": [
-                {
-                    "original": "Worked on backend APIs and database queries.",
-                    "improved": f"Architected high-throughput RESTful APIs with FastAPI and PostgreSQL, reducing query latency by 35%.",
-                    "reason": "Replaces passive language with active verbs and quantifiable performance metrics."
-                }
-            ]
+            "bullet_improvements": bullet_improvements
         }

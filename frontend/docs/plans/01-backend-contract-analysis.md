@@ -21,7 +21,7 @@ Analyzed on the `frontend` branch against the current backend code and existing 
 
 ## Product Model
 
-XYZ Platform is a coding judge with:
+bugX Platform is a coding judge with:
 
 - anonymous access to public problem browsing and leaderboard,
 - user auth, profile, stats, submissions, run, and submit,

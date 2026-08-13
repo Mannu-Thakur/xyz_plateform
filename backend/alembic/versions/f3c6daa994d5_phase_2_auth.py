@@ -7,8 +7,7 @@ Create Date: 2026-05-25 04:30:08.493219
 
 from alembic import op
 import sqlalchemy as sa
-
-
+from sqlalchemy.dialects import postgresql
 
 revision = 'f3c6daa994d5'
 down_revision = '20260525_0001'
@@ -17,14 +16,14 @@ depends_on = None
 
 
 def upgrade() -> None:
-    op.execute("CREATE TYPE roleenum AS ENUM ('USER', 'ADMIN')")
+    op.execute("DO $$ BEGIN IF NOT EXISTS (SELECT 1 FROM pg_type WHERE typname = 'roleenum') THEN CREATE TYPE roleenum AS ENUM ('USER', 'ADMIN'); END IF; END $$;")
     op.create_table(
         'users',
         sa.Column('id', sa.UUID(), nullable=False),
         sa.Column('email', sa.String(length=255), nullable=False),
         sa.Column('username', sa.String(length=50), nullable=False),
         sa.Column('password_hash', sa.String(length=255), nullable=False),
-        sa.Column('role', sa.Enum('USER', 'ADMIN', name='roleenum'), nullable=False),
+        sa.Column('role', postgresql.ENUM('USER', 'ADMIN', name='roleenum', create_type=False), nullable=False),
         sa.Column('avatar_url', sa.String(length=512), nullable=True),
         sa.Column('is_active', sa.Boolean(), nullable=False, server_default=sa.text('true')),
         sa.Column('created_at', sa.DateTime(timezone=True), nullable=False, server_default=sa.text('now()')),

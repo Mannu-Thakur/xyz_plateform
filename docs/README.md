@@ -1,6 +1,6 @@
-# XYZ Platform — Documentation Index
+# bugX Platform — Documentation Index
 
-All planning documents for **xyz_plateform**.
+All planning documents for **bugX**.
 
 ## Requirements & decisions
 

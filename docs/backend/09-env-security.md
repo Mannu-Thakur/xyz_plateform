@@ -5,8 +5,8 @@
 ```env
 ENV=development
 SECRET_KEY=change-me-32-chars-min
-DATABASE_URL=postgresql+asyncpg://xyz_platform:xyz_platform@localhost:5432/xyz_platform
-ALEMBIC_DATABASE_URL=postgresql+psycopg2://xyz_platform:xyz_platform@localhost:5432/xyz_platform
+DATABASE_URL=postgresql+asyncpg://bugx:bugx@localhost:5432/bugx
+ALEMBIC_DATABASE_URL=postgresql+psycopg2://bugx:bugx@localhost:5432/bugx
 REDIS_URL=redis://localhost:6379/0
 JUDGE0_URL=http://localhost:2358
 CORS_ORIGINS=http://localhost:5173
@@ -15,7 +15,7 @@ MAX_SUBMISSIONS_PER_MINUTE=10
 MAX_REQUESTS_PER_MINUTE_IP=100
 MAX_SOURCE_BYTES=65536
 RECLAIM_ALL_RUNNING_ON_START=false
-SEED_ADMIN_EMAIL=admin@xyz-platform.local
+SEED_ADMIN_EMAIL=admin@bugx.local
 SEED_ADMIN_USERNAME=admin
 SEED_ADMIN_PASSWORD=Admin12345
 ```
@@ -46,7 +46,7 @@ SEED_ADMIN_PASSWORD=Admin12345
 
 Add to **`backend/docker-compose.yml`** after postgres/redis (Phase 4). Run `docker compose` from the `backend/` directory.
 
-Use the official CE shape: a Judge0 **server** container plus a Judge0 **workers** container. `/about` only proves the API server is up; `/workers` must show at least one available worker before XYZ submissions can execute.
+Use the official CE shape: a Judge0 **server** container plus a Judge0 **workers** container. `/about` only proves the API server is up; `/workers` must show at least one available worker before bugX submissions can execute.
 
 Create `backend/judge0.conf` from `backend/judge0.conf.example`, set real `POSTGRES_PASSWORD` and `REDIS_PASSWORD`, and keep `backend/judge0.conf` uncommitted.
 
@@ -102,10 +102,10 @@ Run once when adding Judge0 to the stack:
 1. **Start sidecars first:** `docker compose up -d judge0-db judge0-redis` — wait until postgres accepts connections (~10–30s).
 2. **Start Judge0 server + workers:** `docker compose up -d judge0-server judge0-workers` — API on port **2358**.
 3. **Health:** `curl -s http://localhost:2358/about` (or `/system_info` depending on image) returns JSON without connection refused.
-4. **Workers:** `curl -s http://localhost:2358/workers` — confirm `available >= 1`. If `available` is 0, XYZ submissions will remain queued or time out even though `/about` works.
+4. **Workers:** `curl -s http://localhost:2358/workers` — confirm `available >= 1`. If `available` is 0, bugX submissions will remain queued or time out even though `/about` works.
 5. **Languages:** `curl -s http://localhost:2358/languages` — confirm entries with id **71** (Python 3) and **63** (JavaScript / Node). If IDs differ, update `config.py` / Phase 4 language map to match **your** CE image.
 6. **Smoke execute:** submit a trivial Python snippet via Judge0 API and poll/get result; expect `status.id == 3` (Accepted).
-7. **App wiring:** API + XYZ worker containers use `JUDGE0_URL=http://judge0-server:2358` (service name). Host-only uvicorn uses `http://localhost:2358`.
+7. **App wiring:** API + bugX worker containers use `JUDGE0_URL=http://judge0-server:2358` (service name). Host-only uvicorn uses `http://localhost:2358`.
 
 | Symptom | Likely fix |
 |---------|------------|
@@ -116,7 +116,7 @@ Run once when adding Judge0 to the stack:
 | Wrong language id | Re-verify `/languages`; do not assume 71/63 on custom images |
 | Port 2358 in use | Change host port mapping or stop conflicting service |
 
-After Judge0 server and Judge0 workers are healthy, start the **XYZ Platform `worker`** (see [Submission worker](#submission-worker-v1)) before testing submits. This is separate from `judge0-workers`.
+After Judge0 server and Judge0 workers are healthy, start the **bugX Platform `worker`** (see [Submission worker](#submission-worker-v1)) before testing submits. This is separate from `judge0-workers`.
 
 ## Judge0 CE limits (v1)
 
@@ -144,7 +144,7 @@ Create `backend/Dockerfile` before adding these services; both `api` and `worker
       - redis
       - judge0-server
     environment:
-      DATABASE_URL: postgresql+asyncpg://xyz_platform:xyz_platform@postgres:5432/xyz_platform
+      DATABASE_URL: postgresql+asyncpg://bugx:bugx@postgres:5432/bugx
       REDIS_URL: redis://redis:6379/0
       JUDGE0_URL: http://judge0-server:2358
 
@@ -157,7 +157,7 @@ Create `backend/Dockerfile` before adding these services; both `api` and `worker
       - judge0-server
       - judge0-workers
     environment:
-      DATABASE_URL: postgresql+asyncpg://xyz_platform:xyz_platform@postgres:5432/xyz_platform
+      DATABASE_URL: postgresql+asyncpg://bugx:bugx@postgres:5432/bugx
       REDIS_URL: redis://redis:6379/0
       JUDGE0_URL: http://judge0-server:2358
     restart: unless-stopped

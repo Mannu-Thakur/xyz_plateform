@@ -4,6 +4,8 @@
 # Stop everything with: docker compose down -v   (adds -v to wipe volumes too)
 # ─────────────────────────────────────────────────────────────────────────────
 
+name: bugx
+
 services:
 
   # ── Infrastructure ──────────────────────────────────────────────────────────
@@ -12,15 +14,15 @@ services:
     image: postgres:16
     restart: unless-stopped
     ports:
-      - "5432:5432"
+      - "${POSTGRES_HOST_PORT:-5432}:5432"
     environment:
-      POSTGRES_USER: xyz_platform
-      POSTGRES_PASSWORD: xyz_platform
-      POSTGRES_DB: xyz_platform
+      POSTGRES_USER: bugx
+      POSTGRES_PASSWORD: bugx
+      POSTGRES_DB: bugx
     volumes:
       - postgres-data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U xyz_platform"]
+      test: ["CMD-SHELL", "pg_isready -U bugx"]
       interval: 5s
       timeout: 5s
       retries: 10
@@ -29,7 +31,7 @@ services:
     image: redis:7-alpine
     restart: unless-stopped
     ports:
-      - "6379:6379"
+      - "${REDIS_HOST_PORT:-6379}:6379"
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
@@ -83,7 +85,7 @@ services:
       - judge0-db
       - judge0-redis
     ports:
-      - "2358:2358"
+      - "${JUDGE0_HOST_PORT:-2358}:2358"
 
   judge0-workers:
     image: mrkushalsm/judge0:cgv2
@@ -117,7 +119,7 @@ services:
              uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload --reload-dir app"
     restart: unless-stopped
     ports:
-      - "8000:8000"
+      - "${API_HOST_PORT:-8000}:8000"
     volumes:
       - ./backend:/app
     depends_on:
@@ -132,8 +134,8 @@ services:
     environment:
       # Override .env values with Docker-internal service hostnames
       ENV: development
-      DATABASE_URL: postgresql+asyncpg://xyz_platform:xyz_platform@postgres:5432/xyz_platform
-      ALEMBIC_DATABASE_URL: postgresql+psycopg2://xyz_platform:xyz_platform@postgres:5432/xyz_platform
+      DATABASE_URL: postgresql+asyncpg://bugx:bugx@postgres:5432/bugx
+      ALEMBIC_DATABASE_URL: postgresql+psycopg2://bugx:bugx@postgres:5432/bugx
       REDIS_URL: redis://redis:6379/0
       JUDGE0_URL: http://judge0-server:2358
       USE_LOCAL_JUDGE: "true"
@@ -161,7 +163,7 @@ services:
       - ./backend/.env
     environment:
       ENV: development
-      DATABASE_URL: postgresql+asyncpg://xyz_platform:xyz_platform@postgres:5432/xyz_platform
+      DATABASE_URL: postgresql+asyncpg://bugx:bugx@postgres:5432/bugx
       REDIS_URL: redis://redis:6379/0
       JUDGE0_URL: http://judge0-server:2358
       USE_LOCAL_JUDGE: "true"
@@ -185,7 +187,7 @@ services:
       - ./backend/.env
     environment:
       ENV: development
-      DATABASE_URL: postgresql+asyncpg://xyz_platform:xyz_platform@postgres:5432/xyz_platform
+      DATABASE_URL: postgresql+asyncpg://bugx:bugx@postgres:5432/bugx
       REDIS_URL: redis://redis:6379/0
       RATE_LIMIT_FAIL_OPEN: "true"
       PYTHONUTF8: "1"
@@ -198,7 +200,7 @@ services:
     command: sh -c "npm install && npm run dev -- --host 0.0.0.0"
     restart: unless-stopped
     ports:
-      - "5173:5173"
+      - "${FRONTEND_HOST_PORT:-5174}:5173"
     volumes:
       - ./frontend:/app
       - /app/node_modules
